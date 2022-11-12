@@ -1,3 +1,5 @@
+##### MIAC_CONF_BEGIN
+
 # Run some network checks to make sure setup on this machine makes sense.
 # Skip on existing installs since we don't want this to block the ability to
 # upgrade, and these checks are also in the control panel status checks.
@@ -62,3 +64,6 @@ if [ -z "${DEFAULT_PRIMARY_HOSTNAME:-}" -a -z "${SKIP_NETWORK_CHECKS:-}" ]; then
     fi
 
 fi
+
+true
+##### MIAC_CONF_END

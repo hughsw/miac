@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 #
 # Dovecot (IMAP/POP and LDA)
@@ -18,6 +20,10 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
 
 # Install packages for dovecot. These are all core dovecot plugins,
 # but dovecot-lucene is packaged by *us* in the Mail-in-a-Box PPA,
@@ -27,6 +33,11 @@ echo "Installing Dovecot (IMAP server)..."
 apt_install \
 	dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-sqlite sqlite3 \
 	dovecot-sieve dovecot-managesieved
+
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # The `dovecot-imapd`, `dovecot-pop3d`, and `dovecot-lmtpd` packages automatically
 # enable IMAP, POP and LMTP protocols.
@@ -149,10 +160,20 @@ protocol imap {
 }
 EOF
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
+
 # Setting a `postmaster_address` is required or LMTP won't start. An alias
 # will be created automatically by our management daemon.
 tools/editconf.py /etc/dovecot/conf.d/15-lda.conf \
-	postmaster_address=postmaster@$PRIMARY_HOSTNAME
+		  postmaster_address=postmaster@$PRIMARY_HOSTNAME
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # ### Sieve
 
@@ -210,6 +231,12 @@ mkdir -p $STORAGE_ROOT/mail/sieve/global_before
 mkdir -p $STORAGE_ROOT/mail/sieve/global_after
 chown -R mail.mail $STORAGE_ROOT/mail/sieve
 
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_FIREWALL_BEGIN
+
 # Allow the IMAP/POP ports in the firewall.
 ufw_allow imaps
 ufw_allow pop3s
@@ -217,5 +244,12 @@ ufw_allow pop3s
 # Allow the Sieve port in the firewall.
 ufw_allow sieve
 
+##### MIAC_FIREWALL_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Restart services.
 restart_service dovecot
+
+##### MIAC_SYSTEMD_END

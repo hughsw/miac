@@ -1,3 +1,5 @@
+##### MIAC_VARS_BEGIN
+
 # Are we running as root?
 if [[ $EUID -ne 0 ]]; then
 	echo "This script must be run as root. Please re-run like this:"
@@ -64,3 +66,5 @@ if [ "$ARCHITECTURE" != "x86_64" ] && [ "$ARCHITECTURE" != "i686" ]; then
 	echo "You are on your own."
 	echo
 fi
+
+##### MIAC_VARS_END

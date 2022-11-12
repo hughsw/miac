@@ -1,3 +1,5 @@
+##### MIAC_VARS_BEGIN
+
 # Export locale variables
 
 # Ensure Python reads/writes files in UTF-8. If the machine
@@ -17,3 +19,5 @@ export LC_TYPE=en_US.UTF-8
 
 # Fix so line drawing characters are shown correctly in Putty on Windows. See #744.
 export NCURSES_NO_UTF8_ACS=1
+
+##### MIAC_VARS_END

@@ -1,4 +1,9 @@
+##### MIAC_CONF_BEGIN
+
 if [ -z "${NONINTERACTIVE:-}" ]; then
+
+        ##### MIAC_INSTALL_BEGIN
+
 	# Install 'dialog' so we can ask the user questions. The original motivation for
 	# this was being able to ask the user for input even if stdin has been redirected,
 	# e.g. if we piped a bootstrapping install script to bash to get started. In that
@@ -17,6 +22,8 @@ if [ -z "${NONINTERACTIVE:-}" ]; then
 	# so we install the python package globally.
 	hide_output pip3 install "email_validator>=1.0.0" || exit 1
 
+	##### MIAC_INSTALL_END
+	
 	message_box "Mail-in-a-Box Installation" \
 		"Hello and thanks for deploying a Mail-in-a-Box!
 		\n\nI'm going to ask you a few questions.
@@ -207,6 +214,8 @@ if [ "$PRIVATE_IPV6" != "$PUBLIC_IPV6" ]; then
 	echo "Private IPv6 Address: $PRIVATE_IPV6"
 fi
 if [ -f /usr/bin/git ] && [ -d .git ]; then
-	echo "Mail-in-a-Box Version: " $(git describe)
+	echo "Mail-in-a-Box Version: " $(git describe 2> /dev/null || echo Unknown)
 fi
 echo
+
+##### MIAC_CONF_END

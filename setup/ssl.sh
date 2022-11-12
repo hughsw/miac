@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 #
 # RSA private key, SSL certificate, Diffie-Hellman bits files
@@ -24,6 +26,11 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_CONF_BEGIN
+
 # Show a status line if we are going to take any action in this file.
 if  [ ! -f /usr/bin/openssl ] \
  || [ ! -f $STORAGE_ROOT/ssl/ssl_private_key.pem ] \
@@ -32,13 +39,28 @@ if  [ ! -f /usr/bin/openssl ] \
 	echo "Creating initial SSL certificate and perfect forward secrecy Diffie-Hellman parameters..."
 fi
 
+##### MIAC_CONF_END
+
+
+##### MIAC_INSTALL_BEGIN
+
 # Install openssl.
 
 apt_install openssl
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Create a directory to store TLS-related things like "SSL" certificates.
 
 mkdir -p $STORAGE_ROOT/ssl
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
 
 # Generate a new private key.
 #
@@ -66,33 +88,43 @@ if [ ! -f $STORAGE_ROOT/ssl/ssl_private_key.pem ]; then
 		openssl genrsa -out $STORAGE_ROOT/ssl/ssl_private_key.pem 2048)
 fi
 
+# MIAC arguably the self-signed certificate could be a MIAC_GENERIC thing...
+
 # Generate a self-signed SSL certificate because things like nginx, dovecot,
 # etc. won't even start without some certificate in place, and we need nginx
 # so we can offer the user a control panel to install a better certificate.
 if [ ! -f $STORAGE_ROOT/ssl/ssl_certificate.pem ]; then
-	# Generate a certificate signing request.
-	CSR=/tmp/ssl_cert_sign_req-$$.csr
-	hide_output \
+    # Generate a certificate signing request.
+    CSR=/tmp/ssl_cert_sign_req-$$.csr
+    hide_output \
 	openssl req -new -key $STORAGE_ROOT/ssl/ssl_private_key.pem -out $CSR \
-	  -sha256 -subj "/CN=$PRIMARY_HOSTNAME"
+	-sha256 -subj "/CN=$PRIMARY_HOSTNAME"
 
-	# Generate the self-signed certificate.
-	CERT=$STORAGE_ROOT/ssl/$PRIMARY_HOSTNAME-selfsigned-$(date --rfc-3339=date | sed s/-//g).pem
-	hide_output \
+    # Generate the self-signed certificate.
+    CERT=$STORAGE_ROOT/ssl/$PRIMARY_HOSTNAME-selfsigned-$(date --rfc-3339=date | sed s/-//g).pem
+    hide_output \
 	openssl x509 -req -days 365 \
-	  -in $CSR -signkey $STORAGE_ROOT/ssl/ssl_private_key.pem -out $CERT
+	-in $CSR -signkey $STORAGE_ROOT/ssl/ssl_private_key.pem -out $CERT
 
-	# Delete the certificate signing request because it has no other purpose.
-	rm -f $CSR
+    # Delete the certificate signing request because it has no other purpose.
+    rm -f $CSR
 
-	# Symlink the certificate into the system certificate path, so system services
-	# can find it.
-	ln -s $CERT $STORAGE_ROOT/ssl/ssl_certificate.pem
+    # Symlink the certificate into the system certificate path, so system services
+    # can find it.
+    ln -s $CERT $STORAGE_ROOT/ssl/ssl_certificate.pem
 fi
 
 # Generate some Diffie-Hellman cipher bits.
 # openssl's default bit length for this is 1024 bits, but we'll create
 # 2048 bits of bits per the latest recommendations.
 if [ ! -f $STORAGE_ROOT/ssl/dh2048.pem ]; then
-	openssl dhparam -out $STORAGE_ROOT/ssl/dh2048.pem 2048
+    # MIAC adds -dsaparam to speed this up during development
+    # MIAC TODO: switch to single-use DH bits
+    # MIAC: https://www.openssl.org/news/secadv/20160128.txt
+    # MIAC: https://security.stackexchange.com/questions/95178/diffie-hellman-parameters-still-calculating-after-24-hours?
+    # MIAC: lack of good guardrail guidance on this matter...
+    openssl dhparam -dsaparam -out $STORAGE_ROOT/ssl/dh2048.pem 2048
 fi
+
+true
+##### MIAC_CONF_END

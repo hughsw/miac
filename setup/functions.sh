@@ -1,3 +1,5 @@
+##### MIAC_VARS_BEGIN
+
 # Turn on "strict mode." See http://redsymbol.net/articles/unofficial-bash-strict-mode/.
 # -e: exit if any command unexpectedly fails.
 # -u: exit if we have a variable typo.
@@ -16,7 +18,9 @@ function hide_output {
 	# Execute command, redirecting stderr/stdout to the temporary file. Since we
 	# check the return code ourselves, disable 'set -e' temporarily.
 	set +e
-	"$@" &> $OUTPUT
+	# MIAC
+	"$@" 2>&1 | tee $OUTPUT
+	#"$@" &> $OUTPUT
 	E=$?
 	set -e
 
@@ -149,7 +153,14 @@ function ufw_limit {
 }
 
 function restart_service {
-	hide_output service $1 restart
+        hide_output service $1 restart
+}
+
+function restart_systemctl {
+        hide_output systemctl restart $1
+}
+function daemon_reload_systemctl {
+        hide_output systemctl daemon-reload
 }
 
 ## Dialog Functions ##
@@ -222,3 +233,5 @@ function git_clone {
 	mv $TMPPATH/$SUBDIR $TARGETPATH
 	rm -rf $TMPPATH
 }
+
+##### MIAC_VARS_END

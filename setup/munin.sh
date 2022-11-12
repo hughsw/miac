@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 # Munin: resource monitoring tool
 #################################################
@@ -5,10 +7,29 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
+
 # install Munin
 echo "Installing Munin (system monitoring)..."
 apt_install munin munin-node libcgi-fast-perl
 # libcgi-fast-perl is needed by /usr/lib/munin/cgi/munin-cgi-graph
+
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
+# The Debian installer touches these files and chowns them to www-data:adm for use with spawn-fcgi
+chown munin /var/log/munin/munin-cgi-html.log
+chown munin /var/log/munin/munin-cgi-graph.log
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
 
 # edit config
 cat > /etc/munin/munin.conf <<EOF;
@@ -33,10 +54,6 @@ contact.admin.command mail -s "Munin notification \${var:host}" administrator@$P
 contact.admin.always_send warning critical
 EOF
 
-# The Debian installer touches these files and chowns them to www-data:adm for use with spawn-fcgi
-chown munin. /var/log/munin/munin-cgi-html.log
-chown munin. /var/log/munin/munin-cgi-graph.log
-
 # ensure munin-node knows the name of this machine
 # and reduce logging level to warning
 tools/editconf.py /etc/munin/munin-node.conf -s \
@@ -58,6 +75,11 @@ for f in $(find /etc/munin/plugins/ \( -lname /usr/share/munin/plugins/if_ -o -l
 	fi;
 done
 
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Create a 'state' directory. Not sure why we need to do this manually.
 mkdir -p /var/lib/munin-node/plugin-state/
 
@@ -65,8 +87,19 @@ mkdir -p /var/lib/munin-node/plugin-state/
 ln -sf $(pwd)/management/munin_start.sh /usr/local/lib/mailinabox/munin_start.sh
 chmod 0744 /usr/local/lib/mailinabox/munin_start.sh
 cp --remove-destination conf/munin.service /lib/systemd/system/munin.service # target was previously a symlink so remove first
+
+# MIAC is this necessary
+# Ensure this directory exists regardless of whether services will be run that create it
+mkdir -p /var/run/munin
+chown munin:munin /var/run/munin
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 hide_output systemctl link -f /lib/systemd/system/munin.service
-hide_output systemctl daemon-reload
+daemon_reload_systemctl
 hide_output systemctl unmask munin.service
 hide_output systemctl enable munin.service
 
@@ -80,5 +113,8 @@ restart_service munin-node
 # We check to see if munin-cron is already running, if it is, there is no need to run it simultaneously
 # generating an error.
 if [ ! -f /var/run/munin/munin-update.lock ]; then
-	sudo -H -u munin munin-cron
+    # MIAC abstract this kind of activity...
+    sudo -H -u munin munin-cron
 fi
+
+##### MIAC_SYSTEMD_END

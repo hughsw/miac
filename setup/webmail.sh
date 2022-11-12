@@ -1,9 +1,16 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 # Webmail with Roundcube
 # ----------------------
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
+
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
 
 # ### Installing Roundcube
 
@@ -44,10 +51,22 @@ CARDDAV_HASH=74f8ba7aee33e78beb9de07f7f44b81f6071b644
 
 UPDATE_KEY=$VERSION:$PERSISTENT_LOGIN_VERSION:$HTML5_NOTIFIER_VERSION:$CARDDAV_VERSION
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_VARS_BEGIN
+
 # paths that are often reused.
 RCM_DIR=/usr/local/lib/roundcubemail
 RCM_PLUGIN_DIR=${RCM_DIR}/plugins
 RCM_CONFIG=${RCM_DIR}/config/config.inc.php
+
+##### MIAC_VARS_END
+
+
+##### MIAC_INSTALL_BEGIN
+
+# MIAC factor into image install and runtime migrate...
 
 needs_update=0 #NODOC
 if [ ! -f /usr/local/lib/roundcubemail/version ]; then
@@ -95,11 +114,17 @@ if [ $needs_update == 1 ]; then
 	echo $UPDATE_KEY > ${RCM_DIR}/version
 fi
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_CONF_BEGIN
+
 # ### Configuring Roundcube
 
 # Generate a secret key of PHP-string-safe characters appropriate
 # for the cipher algorithm selected below.
 SECRET_KEY=$(dd if=/dev/urandom bs=1 count=32 2>/dev/null | base64 | sed s/=//g)
+
 
 # Create a configuration file.
 #
@@ -168,6 +193,11 @@ cat > ${RCM_PLUGIN_DIR}/carddav/config.inc.php <<EOF;
 ?>
 EOF
 
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Create writable directories.
 mkdir -p /var/log/roundcubemail /var/tmp/roundcubemail $STORAGE_ROOT/mail/roundcube
 chown -R www-data.www-data /var/log/roundcubemail /var/tmp/roundcubemail $STORAGE_ROOT/mail/roundcube
@@ -204,11 +234,25 @@ chown -f -R root.www-data ${RCM_PLUGIN_DIR}/carddav
 # root.www-data need all permissions, others only read
 chmod -R 774 ${RCM_PLUGIN_DIR}/carddav
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
+
+# MIAC migration? semantics of ${RCM_DIR}/bin/updatedb.sh
+
 # Run Roundcube database migration script (database is created if it does not exist)
 php$PHP_VER ${RCM_DIR}/bin/updatedb.sh --dir ${RCM_DIR}/SQL --package roundcube
 chown www-data:www-data $STORAGE_ROOT/mail/roundcube/roundcube.sqlite
 chmod 664 $STORAGE_ROOT/mail/roundcube/roundcube.sqlite
 
+##### MIAC_CONF_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Enable PHP modules.
 phpenmod -v $PHP_VER imap
 restart_service php$PHP_VER-fpm
+
+##### MIAC_SYSTEMD_END

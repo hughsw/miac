@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 # DNS
 # -----------------------------------------------
@@ -10,6 +12,11 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Prepare nsd's configuration.
 # We configure nsd before installation as we only want it to bind to some addresses
 # and it otherwise will have port / bind conflicts with bind9 used as the local resolver
@@ -17,6 +24,12 @@ mkdir -p /var/run/nsd
 mkdir -p /etc/nsd
 mkdir -p /etc/nsd/zones
 touch /etc/nsd/zones.conf
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
+
 
 cat > /etc/nsd/nsd.conf << EOF;
 # Do not edit. Overwritten by Mail-in-a-Box setup.
@@ -38,17 +51,24 @@ server:
 
 EOF
 
+# MIAC TODO: set PRIVATE_IP, unset PRIVATE_IPV6
+
 # Since we have bind9 listening on localhost for locally-generated
 # DNS queries that require a recursive nameserver, and the system
 # might have other network interfaces for e.g. tunnelling, we have
 # to be specific about the network interfaces that nsd binds to.
 for ip in $PRIVATE_IP $PRIVATE_IPV6; do
-	echo "  ip-address: $ip" >> /etc/nsd/nsd.conf;
+    echo "  ip-address: $ip" >> /etc/nsd/nsd.conf;
 done
 
 # Create a directory for additional configuration directives, including
 # the zones.conf file written out by our management daemon.
 echo "include: /etc/nsd/nsd.conf.d/*.conf" >> /etc/nsd/nsd.conf;
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Remove the old location of zones.conf that we generate. It will
 # now be stored in /etc/nsd/nsd.conf.d.
@@ -66,17 +86,28 @@ cat > /etc/logrotate.d/nsd <<EOF;
 }
 EOF
 
+mkdir -p "$STORAGE_ROOT/dns/dnssec";
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_INSTALL_BEGIN
+
 # Install the packages.
 #
 # * nsd: The non-recursive nameserver that publishes our DNS records.
 # * ldnsutils: Helper utilities for signing DNSSEC zones.
 # * openssh-client: Provides ssh-keyscan which we use to create SSHFP records.
 echo "Installing nsd (DNS server)..."
+
 apt_install nsd ldnsutils openssh-client
 
-# Create DNSSEC signing keys.
+##### MIAC_INSTALL_END
 
-mkdir -p "$STORAGE_ROOT/dns/dnssec";
+
+##### MIAC_CONF_BEGIN
+
+# Create DNSSEC signing keys.
 
 # TLDs, registrars, and validating nameservers don't all support the same algorithms,
 # so we'll generate keys using a few different algorithms so that dns_update.py can
@@ -135,6 +166,13 @@ fi
 	# And loop to do the next algorithm...
 done
 
+##### MIAC_CONF_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
+# MIAC TODO: cron config and activation...
+
 # Force the dns_update script to be run every day to re-sign zones for DNSSEC
 # before they expire. When we sign zones (in `dns_update.py`) we specify a
 # 30-day validation window, so we had better re-sign before then.
@@ -146,7 +184,13 @@ $(pwd)/tools/dns_update
 EOF
 chmod +x /etc/cron.daily/mailinabox-dnssec
 
+##### MIAC_SYSTEMD_END
+
+
+##### MIAC_FIREWALL_BEGIN
+
 # Permit DNS queries on TCP/UDP in the firewall.
 
 ufw_allow domain
 
+##### MIAC_FIREWALL_END

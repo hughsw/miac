@@ -1,3 +1,13 @@
+
+##### MIAC_INSTALL_BEGIN
+
+apt_install bind9
+
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # ### Local DNS Service
 
 # Install a local recursive DNS server --- i.e. for DNS queries made by
@@ -44,7 +54,7 @@
 # * The max-recursion-queries directive increases the maximum number of iterative queries.
 #  	If more queries than specified are sent, bind9 returns SERVFAIL. After flushing the cache during system checks,
 #	we ran into the limit thus we are increasing it from 75 (default value) to 100.
-apt_install bind9
+
 tools/editconf.py /etc/default/named \
 	"OPTIONS=\"-u bind -4\""
 if ! grep -q "listen-on " /etc/bind/named.conf.options; then
@@ -55,6 +65,13 @@ if ! grep -q "max-recursion-queries " /etc/bind/named.conf.options; then
 	# Add a max-recursion-queries directive if it doesn't exist inside the options block.
 	sed -i "s/^}/\n\tmax-recursion-queries 100;\n}/" /etc/bind/named.conf.options
 fi
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_RUNTIME_BEGIN
+
+# MIAC abstract this
 
 # First we'll disable systemd-resolved's management of resolv.conf and its stub server.
 # Breaking the symlink to /run/systemd/resolve/stub-resolv.conf means
@@ -70,4 +87,6 @@ echo "nameserver 127.0.0.1" > /etc/resolv.conf
 # Restart the DNS services.
 
 restart_service bind9
-systemctl restart systemd-resolved
+restart_systemctl systemd-resolved
+
+##### MIAC_RUNTIME_END

@@ -1,7 +1,13 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 
 source setup/functions.sh
 source /etc/mailinabox.conf # load global vars
+
+##### MIAC_BOILERPLATE_END
+
+##### MIAC_INSTALL_BEGIN
 
 echo "Installing Mail-in-a-Box system management daemon..."
 
@@ -23,9 +29,15 @@ hide_output pip3 install --upgrade b2sdk boto3
 
 # Create a virtualenv for the installation of Python 3 packages
 # used by the management daemon.
+
+##### MIAC_VARS_BEGIN
+
 inst_dir=/usr/local/lib/mailinabox
-mkdir -p $inst_dir
 venv=$inst_dir/env
+
+##### MIAC_VARS_END
+
+mkdir -p $inst_dir
 if [ ! -d $venv ]; then
 	hide_output virtualenv -ppython3 $venv
 fi
@@ -45,12 +57,21 @@ hide_output $venv/bin/pip install --upgrade \
 
 # CONFIGURATION
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_CONF_BEGIN
+
 # Create a backup directory and a random key for encrypting backups.
 mkdir -p $STORAGE_ROOT/backup
 if [ ! -f $STORAGE_ROOT/backup/secret_key.txt ]; then
 	$(umask 077; openssl rand -base64 2048 > $STORAGE_ROOT/backup/secret_key.txt)
 fi
 
+##### MIAC_CONF_END
+
+
+##### MIAC_INSTALL_BEGIN
 
 # Download jQuery and Bootstrap local files
 
@@ -76,6 +97,11 @@ unzip -q /tmp/bootstrap.zip -d $assets_dir
 mv $assets_dir/bootstrap-$bootstrap_version-dist $assets_dir/bootstrap
 rm -f /tmp/bootstrap.zip
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Create an init script to start the management daemon and keep it
 # running after a reboot.
 # Set a long timeout since some commands take a while to run, matching
@@ -99,9 +125,20 @@ exec gunicorn -b localhost:10222 -w 1 --timeout 630 wsgi:app
 EOF
 chmod +x $inst_dir/start
 cp --remove-destination conf/mailinabox.service /lib/systemd/system/mailinabox.service # target was previously a symlink so remove it first
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 hide_output systemctl link -f /lib/systemd/system/mailinabox.service
-hide_output systemctl daemon-reload
+daemon_reload_systemctl
 hide_output systemctl enable mailinabox.service
+
+##### MIAC_SYSTEMD_END
+
+
+##### MIAC_CONF_BEGIN
 
 # Perform nightly tasks at 3am in system time: take a backup, run
 # status checks and email the administrator any changes.
@@ -113,5 +150,12 @@ cat > /etc/cron.d/mailinabox-nightly << EOF;
 $minute 3 * * *	root	(cd $(pwd) && management/daily_tasks.sh)
 EOF
 
+##### MIAC_CONF_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Start the management server.
 restart_service mailinabox
+
+##### MIAC_SYSTEMD_END

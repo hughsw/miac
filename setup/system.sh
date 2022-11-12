@@ -1,3 +1,6 @@
+
+##### MIAC_BOILERPLATE_BEGIN
+
 source /etc/mailinabox.conf
 source setup/functions.sh # load our functions
 source setup/locale.sh # export locale env vars
@@ -5,11 +8,17 @@ source setup/locale.sh # export locale env vars
 # Basic System Configuration
 # -------------------------
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # ### Set hostname of the box
 
 # If the hostname is not correctly resolvable sudo can't be used. This will result in
 # errors during the install.
 #
+
 # Conditionalized because some VMs forbid changing the hostname -- for
 # these, PRIMARY_HOSTNAME must be set correctly
 if [[ "$PRIMARY_HOSTNAME" != "$(< /etc/hostname)" ]]; then
@@ -17,6 +26,11 @@ if [[ "$PRIMARY_HOSTNAME" != "$(< /etc/hostname)" ]]; then
     echo $PRIMARY_HOSTNAME > /etc/hostname
     hostname $PRIMARY_HOSTNAME
 fi
+
+##### MIAC_SYSTEMD_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # ### Fix permissions
 
@@ -86,27 +100,32 @@ fi
 # (See https://discourse.mailinabox.email/t/journalctl-reclaim-space-on-small-mailinabox/6728/11.)
 tools/editconf.py /etc/systemd/journald.conf MaxRetentionSec=10day
 
-# ### Add PPAs.
+##### MIAC_GENERIC_END
 
-# We install some non-standard Ubuntu packages maintained by other
-# third-party providers. First ensure add-apt-repository is installed.
 
-if [ ! -f /usr/bin/add-apt-repository ]; then
+##### MIAC_INSTALL_BEGIN
+
+    # ### Add PPAs.
+
+    # We install some non-standard Ubuntu packages maintained by other
+    # third-party providers. First ensure add-apt-repository is installed.
+
+    if [ ! -f /usr/bin/add-apt-repository ]; then
 	echo "Installing add-apt-repository..."
 	hide_output apt-get update
 	apt_install software-properties-common
-fi
+    fi
 
-# Ensure the universe repository is enabled since some of our packages
-# come from there and minimal Ubuntu installs may have it turned off.
-hide_output add-apt-repository -y universe
+    # Ensure the universe repository is enabled since some of our packages
+    # come from there and minimal Ubuntu installs may have it turned off.
+    hide_output add-apt-repository -y universe
 
-# Install the duplicity PPA.
-hide_output add-apt-repository -y ppa:duplicity-team/duplicity-release-git
+    # Install the duplicity PPA.
+    hide_output add-apt-repository -y ppa:duplicity-team/duplicity-release-git
 
-# Stock PHP is now 8.1, but we're transitioning through 8.0 because
-# of Nextcloud.
-hide_output add-apt-repository --y ppa:ondrej/php
+    # Stock PHP is now 8.1, but we're transitioning through 8.0 because
+    # of Nextcloud.
+    hide_output add-apt-repository --y ppa:ondrej/php
 
 # ### Update Packages
 
@@ -145,6 +164,11 @@ apt_install python3 python3-dev python3-pip python3-setuptools \
 	pollinate openssh-client unzip \
 	unattended-upgrades cron ntp fail2ban rsyslog
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # ### Suppress Upgrade Prompts
 # When Ubuntu 20 comes out, we don't want users to be prompted to upgrade,
 # because we don't yet support it.
@@ -152,6 +176,11 @@ if [ -f /etc/update-manager/release-upgrades ]; then
 	tools/editconf.py /etc/update-manager/release-upgrades Prompt=never
 	rm -f /var/lib/ubuntu-release-upgrader/release-upgrade-available
 fi
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
 
 # ### Set the system timezone
 #
@@ -233,11 +262,19 @@ fi
 echo Initializing system random number generator...
 dd if=/dev/random of=/dev/urandom bs=1 count=32 2> /dev/null
 
+
+##### MIAC_MOOT_BEGIN
+
+# MIAC stages sequencing means this block is moot
+
 # This is supposedly sufficient. But because we're not sure if hardware entropy
 # is really any good on virtualized systems, we'll also seed from Ubuntu's
 # pollinate servers:
+# Note: pollinate requires /dev/log which implies systemd is running...
+ pollinate  -q -r
 
-pollinate  -q -r
+##### MIAC_MOOT_END
+
 
 # Between these two, we really ought to be all set.
 
@@ -246,6 +283,11 @@ if [ ! -f /root/.ssh/id_rsa_miab ]; then
 	echo 'Creating SSH key for backup…'
 	ssh-keygen -t rsa -b 2048 -a 100 -f /root/.ssh/id_rsa_miab -N '' -q
 fi
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # ### Package maintenance
 #
@@ -257,6 +299,11 @@ APT::Periodic::Update-Package-Lists "1";
 APT::Periodic::Unattended-Upgrade "1";
 APT::Periodic::Verbose "0";
 EOF
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_FIREWALL_BEGIN
 
 # ### Firewall
 
@@ -286,6 +333,4 @@ if [ -z "${DISABLE_FIREWALL:-}" ]; then
 	ufw --force enable;
 fi #NODOC
 
-
-# Prevent false result from the above if from being the result of sourcing this file
-true
+##### MIAC_FIREWALL_END

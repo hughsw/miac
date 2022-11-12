@@ -1,3 +1,5 @@
+##### MIAC_SYSTEMD_BEGIN
+
 # If there aren't any mail users yet, create one.
 if [ -z "$(management/cli.py user)" ]; then
 	# The outut of "management/cli.py user" is a list of mail users. If there
@@ -55,3 +57,14 @@ if [ -z "$(management/cli.py user)" ]; then
 	# Create an alias to which we'll direct all automatically-created administrative aliases.
 	management/cli.py alias add administrator@$PRIMARY_HOSTNAME $EMAIL_ADDR > /dev/null
 fi
+
+# MIAC This nsd churn has been necessary at times -- something is clearly fragile,
+# given recent changes (hacks) to work around failures of:
+#    $ nsd-control reconfig
+#    $ nsd-control reload
+restart_service nsd
+nsd-control reconfig
+nsd-control reload
+restart_service nsd
+
+##### MIAC_SYSTEMD_END

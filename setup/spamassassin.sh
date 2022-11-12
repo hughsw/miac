@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 # Spam filtering with spamassassin via spampd
 # -------------------------------------------
@@ -12,6 +14,11 @@
 source /etc/mailinabox.conf # get global vars
 source setup/functions.sh # load our functions
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
+
 # Install packages and basic configuration
 # ----------------------------------------
 
@@ -21,6 +28,11 @@ source setup/functions.sh # load our functions
 # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=689414
 echo "Installing SpamAssassin..."
 apt_install spampd razor pyzor dovecot-antispam libmail-dkim-perl
+
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Allow spamassassin to download new rules.
 tools/editconf.py /etc/default/spamassassin \
@@ -67,6 +79,10 @@ tools/editconf.py /etc/spamassassin/local.cf -s \
 	"add_header all Report"=_REPORT_ \
 	"add_header all Score"=_SCORE_
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
 
 # Authentication-Results SPF/Dmarc checks
 # ---------------------------------------
@@ -116,6 +132,11 @@ header SPF_FAIL Authentication-Results =~ /$escapedprimaryhostname; spf=fail/
 describe SPF_FAIL SPF check failed
 score SPF_FAIL 5.0
 EOF
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Bayesean learning
 # -----------------
@@ -187,6 +208,11 @@ sudo -u spampd /usr/bin/sa-learn --sync 2>/dev/null
 chmod -R 660 $STORAGE_ROOT/mail/spamassassin
 chmod 770 $STORAGE_ROOT/mail/spamassassin
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Initial training?
 # sa-learn --ham storage/mail/mailboxes/*/*/cur/
 # sa-learn --spam storage/mail/mailboxes/*/*/.Spam/cur/
@@ -195,3 +221,4 @@ chmod 770 $STORAGE_ROOT/mail/spamassassin
 restart_service spampd
 restart_service dovecot
 
+##### MIAC_SYSTEMD_END

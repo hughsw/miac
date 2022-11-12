@@ -1,9 +1,16 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 # Nextcloud
 ##########################
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
+
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
 
 # ### Installing Nextcloud
 
@@ -54,6 +61,16 @@ tools/editconf.py /etc/php/$PHP_VER/mods-available/apcu.ini -c ';' \
 	apc.enabled=1 \
 	apc.enable_cli=1
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_INSTALL_BEGIN
+
+# MIAC nextcloud install/upgrade is complicated because of how install/backup/migrate/conf/update are all mixed together...
+# MIAC Note: uses $STORAGE_ROOT
+# MIAC TODO: figure out if/how to support pre-miac installations...
+# MIAC TODO: factor install semantics from MIAC-specific backup/migrate/conf/update
+
 InstallNextcloud() {
 
 	version=$1
@@ -103,6 +120,10 @@ InstallNextcloud() {
 	# Fix weird permissions.
 	chmod 750 /usr/local/lib/owncloud/{apps,config}
 
+	# MIAC consider install/generic/conf refactoring to start here...
+
+	# MIAC generic
+
 	# Create a symlink to the config.php in STORAGE_ROOT (for upgrades we're restoring the symlink we previously
 	# put in, and in new installs we're creating a symlink and will create the actual config later).
 	ln -sf $STORAGE_ROOT/owncloud/config.php /usr/local/lib/owncloud/config/config.php
@@ -111,6 +132,8 @@ InstallNextcloud() {
 	# $STORAGE_ROOT/owncloud may not yet exist, so use -f to suppress
 	# that error.
 	chown -f -R www-data.www-data $STORAGE_ROOT/owncloud /usr/local/lib/owncloud || /bin/true
+
+	# MIAC third-party migrate
 
 	# If this isn't a new installation, immediately run the upgrade script.
 	# Then check for success (0=ok and 3=no upgrade needed, both are success).
@@ -134,6 +157,8 @@ InstallNextcloud() {
 	fi
 }
 
+# MIAC migrate/version/state semantics
+
 # Current Nextcloud Version, #1623
 # Checking /usr/local/lib/owncloud/version.php shows version of the Nextcloud application, not the DB
 # $STORAGE_ROOT/owncloud is kept together even during a backup.  It is better to rely on config.php than
@@ -146,6 +171,8 @@ if [ -f "$STORAGE_ROOT/owncloud/config.php" ]; then
 else
 	CURRENT_NEXTCLOUD_VER=""
 fi
+
+# MIAC initial install is simple compared to migrate/update
 
 # If the Nextcloud directory is missing (never been installed before, or the nextcloud version to be installed is different
 # from the version currently installed, do the install/upgrade
@@ -195,6 +222,11 @@ if [ ! -d /usr/local/lib/owncloud/ ] || [[ ! ${CURRENT_NEXTCLOUD_VER} =~ ^$nextc
 
 	InstallNextcloud $nextcloud_ver $nextcloud_hash $contacts_ver $contacts_hash $calendar_ver $calendar_hash $user_external_ver $user_external_hash
 fi
+
+##### MIAC_INSTALL_END
+
+
+##### MIAC_CONF_BEGIN
 
 # ### Configuring Nextcloud
 
@@ -353,11 +385,21 @@ tools/editconf.py /etc/php/$PHP_VER/cli/conf.d/10-opcache.ini -c ';' \
 	opcache.save_comments=1 \
 	opcache.revalidate_freq=1
 
+##### MIAC_CONF_END
+
+
+##### MIAC_MIGRATE_BEGIN
+
 # Migrate users_external data from <0.6.0 to version 3.0.0 (see https://github.com/nextcloud/user_external).
 # This version was probably in use in Mail-in-a-Box v0.41 (February 26, 2019) and earlier.
 # We moved to v0.6.3 in 193763f8. Ignore errors - maybe there are duplicated users with the
 # correct backend already.
 sqlite3 $STORAGE_ROOT/owncloud/owncloud.db "UPDATE oc_users_external SET backend='127.0.0.1';" || /bin/true
+
+##### MIAC_MIGRATE_END
+
+
+##### MIAC_SYSTEMD_BEGIN
 
 # Set up a cron job for Nextcloud.
 cat > /etc/cron.d/mailinabox-nextcloud << EOF;
@@ -378,3 +420,5 @@ chmod +x /etc/cron.d/mailinabox-nextcloud
 
 # Enable PHP modules and restart PHP.
 restart_service php$PHP_VER-fpm
+
+##### MIAC_SYSTEMD_END

@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 # OpenDKIM
 # --------
@@ -9,9 +11,18 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+##### MIAC_INSTALL_BEGIN
+
 # Install DKIM...
 echo Installing OpenDKIM/OpenDMARC...
 apt_install opendkim opendkim-tools opendmarc
+
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Make sure configuration directories exist.
 mkdir -p /etc/opendkim;
@@ -42,6 +53,11 @@ RequireSafeKeys         false
 EOF
 fi
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
+
 # Create a new DKIM key. This creates mail.private and mail.txt
 # in $STORAGE_ROOT/mail/dkim. The former is the private key and
 # the latter is the suggested DNS TXT entry which we'll include
@@ -59,6 +75,11 @@ fi
 # Ensure files are owned by the opendkim user and are private otherwise.
 chown -R opendkim:opendkim $STORAGE_ROOT/mail/dkim
 chmod go-rwx $STORAGE_ROOT/mail/dkim
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 tools/editconf.py /etc/opendmarc.conf -s \
 	"Syslog=true" \
@@ -114,6 +135,11 @@ tools/editconf.py /etc/postfix/main.cf \
 	non_smtpd_milters=\$smtpd_milters \
 	milter_default_action=accept
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # We need to explicitly enable the opendmarc service, or it will not start
 hide_output systemctl enable opendmarc
 
@@ -122,3 +148,4 @@ restart_service opendkim
 restart_service opendmarc
 restart_service postfix
 
+##### MIAC_SYSTEMD_END

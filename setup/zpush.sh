@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 #
 # Z-Push: The Microsoft Exchange protocol server
@@ -12,6 +14,11 @@
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
+
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
 
 # Prereqs.
 
@@ -45,6 +52,11 @@ if [ $needs_update == 1 ]; then
 	echo $VERSION > /usr/local/lib/z-push/version
 fi
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Configure default config.
 sed -i "s^define('TIMEZONE', .*^define('TIMEZONE', '$(cat /etc/timezone)');^" /usr/local/lib/z-push/config.php
 sed -i "s/define('BACKEND_PROVIDER', .*/define('BACKEND_PROVIDER', 'BackendCombined');/" /usr/local/lib/z-push/config.php
@@ -73,8 +85,20 @@ cp conf/zpush/backend_caldav.php /usr/local/lib/z-push/backend/caldav/config.php
 # Configure Autodiscover
 rm -f /usr/local/lib/z-push/autodiscover/config.php
 cp conf/zpush/autodiscover_config.php /usr/local/lib/z-push/autodiscover/config.php
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
+
 sed -i "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" /usr/local/lib/z-push/autodiscover/config.php
+
 sed -i "s^define('TIMEZONE', .*^define('TIMEZONE', '$(cat /etc/timezone)');^" /usr/local/lib/z-push/autodiscover/config.php
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Some directories it will use.
 
@@ -98,6 +122,11 @@ cat > /etc/logrotate.d/z-push <<EOF;
 }
 EOF
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Restart service.
 
 restart_service php$PHP_VER-fpm
@@ -105,3 +134,5 @@ restart_service php$PHP_VER-fpm
 # Fix states after upgrade
 
 hide_output php$PHP_VER /usr/local/lib/z-push/z-push-admin.php -a fixstates
+
+##### MIAC_SYSTEMD_END

@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 #
 # User Authentication and Destination Validation
@@ -10,12 +12,22 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_VARS_BEGIN
+
 # ### User and Alias Database
 
 # The database of mail users (i.e. authenticated users, who have mailboxes)
 # and aliases (forwarders).
 
 db_path=$STORAGE_ROOT/mail/users.sqlite
+
+##### MIAC_VARS_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Create an empty database if it doesn't yet exist.
 if [ ! -f $db_path ]; then
@@ -153,10 +165,15 @@ dbpath=$db_path
 query = SELECT destination from (SELECT destination, 0 as priority FROM aliases WHERE source='%s' AND destination<>'' UNION SELECT email as destination, 1 as priority FROM users WHERE email='%s' UNION SELECT destination, 2 as priority FROM auto_aliases WHERE source='%s' AND destination<>'') ORDER BY priority LIMIT 1;
 EOF
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Restart Services
 ##################
 
 restart_service postfix
 restart_service dovecot
 
-
+##### MIAC_SYSTEMD_END

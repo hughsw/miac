@@ -1,3 +1,5 @@
+##### MIAC_BOILERPLATE_BEGIN
+
 #!/bin/bash
 #
 # Postfix (SMTP)
@@ -30,6 +32,11 @@
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
+##### MIAC_BOILERPLATE_END
+
+
+##### MIAC_INSTALL_BEGIN
+
 # ### Install packages.
 
 # Install postfix's packages.
@@ -44,6 +51,11 @@ source /etc/mailinabox.conf # load global vars
 echo "Installing Postfix (SMTP server)..."
 apt_install postfix postfix-sqlite postfix-pcre postgrey ca-certificates
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_CONF_BEGIN
+
 # ### Basic Settings
 
 # Set some basic settings...
@@ -52,14 +64,20 @@ apt_install postfix postfix-sqlite postfix-pcre postgrey ca-certificates
 # * Make outgoing connections on a particular interface (if multihomed) so that SPF passes on the receiving side.
 # * Set our name (the Debian default seems to be "localhost" but make it our hostname).
 # * Set the name of the local machine to localhost, which means xxx@localhost is delivered locally, although we don't use it.
+
 # * Set the SMTP banner (which must have the hostname first, then anything).
 tools/editconf.py /etc/postfix/main.cf \
-	inet_interfaces=all \
-	smtp_bind_address=$PRIVATE_IP \
-	smtp_bind_address6=$PRIVATE_IPV6 \
-	myhostname=$PRIMARY_HOSTNAME\
-	smtpd_banner="\$myhostname ESMTP Hi, I'm a Mail-in-a-Box (Ubuntu/Postfix; see https://mailinabox.email/)" \
-	mydestination=localhost
+		      inet_interfaces=all \
+		      smtp_bind_address=$PRIVATE_IP \
+		      smtp_bind_address6=$PRIVATE_IPV6 \
+		      myhostname=$PRIMARY_HOSTNAME\
+		      smtpd_banner="\$myhostname ESMTP Hi, I'm a Mail-in-a-Box (Ubuntu/Postfix; see https://mailinabox.email/)" \
+		      mydestination=localhost
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Tweak some queue settings:
 # * Inform users when their e-mail delivery is delayed more than 3 hours (default is not to warn).
@@ -106,11 +124,23 @@ tools/editconf.py /etc/postfix/master.cf -s -w \
 # Install the `outgoing_mail_header_filters` file required by the new 'authclean' service.
 cp conf/postfix_outgoing_mail_header_filters /etc/postfix/outgoing_mail_header_filters
 
+##### MIAC_GENERIC_END
+
+
+##### MIAC_CONF_BEGIN
+
+# Configuring a specific installation, not just a generic build
+
 # Modify the `outgoing_mail_header_filters` file to use the local machine name and ip
 # on the first received header line.  This may help reduce the spam score of email by
 # removing the 127.0.0.1 reference.
 sed -i "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" /etc/postfix/outgoing_mail_header_filters
 sed -i "s/PUBLIC_IP/$PUBLIC_IP/" /etc/postfix/outgoing_mail_header_filters
+
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
 
 # Enable TLS on incoming connections. It is not required on port 25, allowing for opportunistic
 # encryption. On ports 465 and 587 it is mandatory (see above). Shared and non-shared settings are
@@ -248,8 +278,15 @@ tools/editconf.py /etc/default/postgrey \
 
 # If the $STORAGE_ROOT/mail/postgrey is empty, copy the postgrey database over from the old location
 if [ ! -d $STORAGE_ROOT/mail/postgrey/db ]; then
-	# Stop the service
-	service postgrey stop
+
+        ##### MIAC_MOOT_BEGIN
+
+        # Stop the service
+        service postgrey stop
+
+        ##### MIAC_MOOT_END
+
+
 	# Ensure the new paths for postgrey db exists
 	mkdir -p $STORAGE_ROOT/mail/postgrey/db
 	# Move over database files
@@ -283,12 +320,24 @@ if [ ! -f /etc/postgrey/whitelist_clients ] || find /etc/postgrey/whitelist_clie
 fi
 EOF
 chmod +x /etc/cron.daily/mailinabox-postgrey-whitelist
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 /etc/cron.daily/mailinabox-postgrey-whitelist
+
+##### MIAC_SYSTEMD_END
+
 
 # Increase the message size limit from 10MB to 128MB.
 # The same limit is specified in nginx.conf for mail submitted via webmail and Z-Push.
 tools/editconf.py /etc/postfix/main.cf \
 	message_size_limit=134217728
+
+##### MIAC_GENERIC_END
+
+
+##### MIAC_FIREWALL_BEGIN
 
 # Allow the two SMTP ports in the firewall.
 
@@ -296,7 +345,15 @@ ufw_allow smtp
 ufw_allow smtps
 ufw_allow submission
 
+##### MIAC_FIREWALL_END
+
+
+##### MIAC_SYSTEMD_BEGIN
+
 # Restart services
 
 restart_service postfix
 restart_service postgrey
+
+##### MIAC_SYSTEMD_END
+
