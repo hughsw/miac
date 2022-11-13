@@ -133,10 +133,10 @@ def generate_documentation():
                         if fn in ("setup/start.sh", "setup/preflight.sh", "setup/questions.sh", "setup/firstuser.sh", "setup/management.sh"):
                                 continue
 
-		import sys
-		print(fn, file=sys.stderr)
+                        import sys
+                        print(fn, file=sys.stderr)
 
-		print(BashScript.parse(fn))
+                        print(BashScript.parse(fn))
 
 	print("""
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.1/jquery.min.js"></script>

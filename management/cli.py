@@ -34,17 +34,17 @@ def mgmt(cmd, data=None, is_json=False):
 	return resp
 
 def read_password():
-    while True:
-        first = getpass.getpass('password: ')
-        if len(first) < 8:
-            print("Passwords must be at least eight characters.")
-            continue
-        second = getpass.getpass(' (again): ')
-        if first != second:
-            print("Passwords not the same. Try again.")
-            continue
-        break
-    return first
+	while True:
+		first = getpass.getpass('password: ')
+		if len(first) < 8:
+			print("Passwords must be at least eight characters.")
+			continue
+		second = getpass.getpass(' (again): ')
+		if first != second:
+			print("Passwords not the same. Try again.")
+			continue
+		break
+	return first
 
 def setup_key_auth(mgmt_uri):
 	with open('/var/lib/mailinabox/api.key', 'r') as f:
