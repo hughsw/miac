@@ -15,24 +15,29 @@ function hide_output {
 
 	# Execute command, redirecting stderr/stdout to the temporary file. Since we
 	# check the return code ourselves, disable 'set -e' temporarily.
-	set +e
-	"$@" &> $OUTPUT
-	E=$?
-	set -e
+	if [ -z "${MIAC_VERBOSE:-}" ]; then
+		set +e
+		"$@" &> $OUTPUT
+		E=$?
+		set -e
 
-	# If the command failed, show the output that was captured in the temporary file.
-	if [ $E != 0 ]; then
-		# Something failed.
-		echo
-		echo FAILED: "$@"
-		echo -----------------------------------------
-		cat $OUTPUT
-		echo -----------------------------------------
-		exit $E
+		# If the command failed, show the output that was captured in the temporary file.
+		if [ $E != 0 ]; then
+			# Something failed.
+			echo
+			echo FAILED: "$@"
+			echo -----------------------------------------
+			cat $OUTPUT
+			echo -----------------------------------------
+			exit $E
+		fi
+
+		# Remove temporary file.
+		rm -f $OUTPUT
+	else
+		# MIAC_VERBOSE: no redirect, fail immediately on error
+		"$@"
 	fi
-
-	# Remove temporary file.
-	rm -f $OUTPUT
 }
 
 function apt_get_quiet {
