@@ -62,7 +62,7 @@ if [ ! -d $HOME/mailinabox ]; then
 	echo Downloading Mail-in-a-Box $TAG. . .
 	git clone \
 		-b $TAG --depth 1 \
-		https://github.com/mail-in-a-box/mailinabox \
+		https://github.com/hughsw/miac.git \
 		$HOME/mailinabox \
 		< /dev/null 2> /dev/null
 
@@ -84,5 +84,4 @@ if [ "$TAG" != $(git describe) ]; then
 fi
 
 # Start setup script.
-setup/start.sh
-
+echo MIAC skipping: setup/start.sh
