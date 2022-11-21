@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_CONF_BEGIN
 
 #!/bin/bash
 # OpenDKIM
@@ -7,6 +7,11 @@
 # OpenDKIM provides a service that puts a DKIM signature on outbound mail.
 #
 # The DNS configuration for DKIM is done in the management daemon.
+
+##### MIAC_CONF_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
@@ -56,7 +61,7 @@ fi
 ##### MIAC_GENERIC_END
 
 
-##### MIAC_CONF_BEGIN
+##### MIAC_SSL_BEGIN
 
 # Create a new DKIM key. This creates mail.private and mail.txt
 # in $STORAGE_ROOT/mail/dkim. The former is the private key and
@@ -76,7 +81,7 @@ fi
 chown -R opendkim:opendkim $STORAGE_ROOT/mail/dkim
 chmod go-rwx $STORAGE_ROOT/mail/dkim
 
-##### MIAC_CONF_END
+##### MIAC_SSL_END
 
 
 ##### MIAC_GENERIC_BEGIN

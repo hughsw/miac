@@ -119,7 +119,7 @@ chmod a+rx /var/lib/mailinabox
 ##### MIAC_GENERIC_END
 
 
-##### MIAC_CONF_BEGIN
+##### MIAC_SSL_BEGIN
 
 cat conf/ios-profile.xml \
 	| sed "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" \
@@ -129,6 +129,11 @@ cat conf/ios-profile.xml \
 	| sed "s/UUID4/$(cat /proc/sys/kernel/random/uuid)/" \
 	 > /var/lib/mailinabox/mobileconfig.xml
 chmod a+r /var/lib/mailinabox/mobileconfig.xml
+
+##### MIAC_SSL_END
+
+
+##### MIAC_CONF_BEGIN
 
 # Create the Mozilla Auto-configuration file which is exposed via the
 # nginx configuration at /.well-known/autoconfig/mail/config-v1.1.xml.

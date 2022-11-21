@@ -48,27 +48,36 @@ hide_output $venv/bin/pip install --upgrade pip
 # Install other Python 3 packages used by the management daemon.
 # The first line is the packages that Josh maintains himself!
 # NOTE: email_validator is repeated in setup/questions.sh, so please keep the versions synced.
+# MIAC adds final line: pythondialog validators
 hide_output $venv/bin/pip install --upgrade \
 	rtyaml "email_validator>=1.0.0" "exclusiveprocess" \
 	flask dnspython python-dateutil expiringdict gunicorn \
 	qrcode[pil] pyotp \
 	"idna>=2.0.0" "cryptography==37.0.2" psutil postfix-mta-sts-resolver \
-	b2sdk boto3
+	b2sdk boto3 \
+	pythondialog validators
 
 # CONFIGURATION
 
 ##### MIAC_INSTALL_END
 
 
-##### MIAC_CONF_BEGIN
+##### MIAC_SSL_BEGIN
+
+# MIAC Note: unlike most secrets, we do not recreate these backup-supporting keys on each run
 
 # Create a backup directory and a random key for encrypting backups.
 mkdir -p $STORAGE_ROOT/backup
 if [ ! -f $STORAGE_ROOT/backup/secret_key.txt ]; then
 	$(umask 077; openssl rand -base64 2048 > $STORAGE_ROOT/backup/secret_key.txt)
 fi
+# We may need an ssh key to store backups via rsync, if it doesn't exist create one
+if [ ! -f $STORAGE_ROOT/backup/id_rsa_miab ]; then
+	echo 'Creating SSH key for backup…'
+	ssh-keygen -t rsa -b 2048 -a 100 -f $STORAGE_ROOT/backup/id_rsa_miab -N '' -q -C "root@$PRIMARY_HOSTNAME"
+fi
 
-##### MIAC_CONF_END
+##### MIAC_SSL_END
 
 
 ##### MIAC_INSTALL_BEGIN

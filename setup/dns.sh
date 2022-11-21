@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_CONF_BEGIN
 
 #!/bin/bash
 # DNS
@@ -8,6 +8,11 @@
 # created by the /dns/update API in the management server because
 # the set of zones (domains) hosted by the server depends on the
 # mail users & aliases created by the user later.
+
+##### MIAC_CONF_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
@@ -29,7 +34,6 @@ touch /etc/nsd/zones.conf
 
 
 ##### MIAC_CONF_BEGIN
-
 
 cat > /etc/nsd/nsd.conf << EOF;
 # Do not edit. Overwritten by Mail-in-a-Box setup.
@@ -105,7 +109,7 @@ apt_install nsd ldnsutils openssh-client
 ##### MIAC_INSTALL_END
 
 
-##### MIAC_CONF_BEGIN
+##### MIAC_SSL_BEGIN
 
 # Create DNSSEC signing keys.
 
@@ -166,7 +170,7 @@ fi
 	# And loop to do the next algorithm...
 done
 
-##### MIAC_CONF_END
+##### MIAC_SSL_END
 
 
 ##### MIAC_SYSTEMD_BEGIN

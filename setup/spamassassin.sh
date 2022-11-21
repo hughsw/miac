@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_CONF_BEGIN
 
 #!/bin/bash
 # Spam filtering with spamassassin via spampd
@@ -10,6 +10,11 @@
 #
 # In order to move spam automatically into the Spam folder we use the dovecot sieve
 # plugin.
+
+##### MIAC_CONF_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
 
 source /etc/mailinabox.conf # get global vars
 source setup/functions.sh # load our functions

@@ -64,7 +64,7 @@ tools/editconf.py /etc/munin/munin-node.conf -s \
 munin-node-configure --shell --remove-also 2>/dev/null | sh || /bin/true
 
 # Deactivate monitoring of NTP peers. Not sure why anyone would want to monitor a NTP peer. The addresses seem to change
-# (which is taken care of my munin-node-configure, but only when we re-run it.)
+# (which is taken care of by munin-node-configure, but only when we re-run it.)
 find /etc/munin/plugins/ -lname /usr/share/munin/plugins/ntp_ -print0 | xargs -0 /bin/rm -f
 
 # Deactivate monitoring of network interfaces that are not up. Otherwise we can get a lot of empty charts.
@@ -88,7 +88,7 @@ ln -sf $(pwd)/management/munin_start.sh /usr/local/lib/mailinabox/munin_start.sh
 chmod 0744 /usr/local/lib/mailinabox/munin_start.sh
 cp --remove-destination conf/munin.service /lib/systemd/system/munin.service # target was previously a symlink so remove first
 
-# MIAC is this necessary
+# MIAC not sure if these steps are necessary
 # Ensure this directory exists regardless of whether services will be run that create it
 mkdir -p /var/run/munin
 chown munin:munin /var/run/munin

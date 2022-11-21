@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_SSL_BEGIN
 
 #!/bin/bash
 #
@@ -23,13 +23,18 @@
 # Diffie-Hellman cipher is selected during TLS negotiation. Diffie-Hellman
 # provides Perfect Forward Secrecy.
 
+##### MIAC_SSL_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
+
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars
 
 ##### MIAC_BOILERPLATE_END
 
 
-##### MIAC_CONF_BEGIN
+##### MIAC_SSL_BEGIN
 
 # Show a status line if we are going to take any action in this file.
 if  [ ! -f /usr/bin/openssl ] \
@@ -39,7 +44,7 @@ if  [ ! -f /usr/bin/openssl ] \
 	echo "Creating initial SSL certificate and perfect forward secrecy Diffie-Hellman parameters..."
 fi
 
-##### MIAC_CONF_END
+##### MIAC_SSL_END
 
 
 ##### MIAC_INSTALL_BEGIN
@@ -60,7 +65,7 @@ mkdir -p $STORAGE_ROOT/ssl
 ##### MIAC_GENERIC_END
 
 
-##### MIAC_CONF_BEGIN
+##### MIAC_SSL_BEGIN
 
 # Generate a new private key.
 #
@@ -87,8 +92,6 @@ if [ ! -f $STORAGE_ROOT/ssl/ssl_private_key.pem ]; then
 	(umask 077; hide_output \
 		openssl genrsa -out $STORAGE_ROOT/ssl/ssl_private_key.pem 2048)
 fi
-
-# MIAC arguably the self-signed certificate could be a MIAC_GENERIC thing...
 
 # Generate a self-signed SSL certificate because things like nginx, dovecot,
 # etc. won't even start without some certificate in place, and we need nginx
@@ -118,13 +121,12 @@ fi
 # openssl's default bit length for this is 1024 bits, but we'll create
 # 2048 bits of bits per the latest recommendations.
 if [ ! -f $STORAGE_ROOT/ssl/dh2048.pem ]; then
-    # MIAC adds -dsaparam to speed this up during development
-    # MIAC TODO: switch to single-use DH bits
-    # MIAC: https://www.openssl.org/news/secadv/20160128.txt
-    # MIAC: https://security.stackexchange.com/questions/95178/diffie-hellman-parameters-still-calculating-after-24-hours?
-    # MIAC: lack of good guardrail guidance on this matter...
-    openssl dhparam -dsaparam -out $STORAGE_ROOT/ssl/dh2048.pem 2048
+	# MIAC adds -dsaparam to speed this up during development
+	# MIAC TODO: switch to single-use DH bits, e.g. daily cron refresh...
+	# MIAC: https://www.openssl.org/news/secadv/20160128.txt
+	# MIAC: https://security.stackexchange.com/questions/95178/diffie-hellman-parameters-still-calculating-after-24-hours?
+	# MIAC: lack of good guardrail guidance on this technical matter...
+	openssl dhparam -dsaparam -out $STORAGE_ROOT/ssl/dh2048.pem 2048
 fi
 
-true
-##### MIAC_CONF_END
+##### MIAC_SSL_END

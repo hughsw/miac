@@ -1,4 +1,4 @@
-##### MIAC_CONF_BEGIN
+##### MIAC_GENERIC_BEGIN
 
 # Register with Let's Encrypt, including agreeing to the Terms of Service.
 # We'd let certbot ask the user interactively, but when this script is
@@ -14,4 +14,4 @@ if [ ! -d $STORAGE_ROOT/ssl/lets_encrypt/accounts/acme-v02.api.letsencrypt.org/ 
     certbot register --register-unsafely-without-email --agree-tos --config-dir $STORAGE_ROOT/ssl/lets_encrypt
 fi
 
-##### MIAC_CONF_END
+##### MIAC_GENERIC_END

@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_CONF_BEGIN
 
 #!/bin/bash
 #
@@ -16,6 +16,11 @@
 # Dovecot's LDA role comes after spam filtering. Postfix hands mail off
 # to Spamassassin which in turn hands it off to Dovecot. This all happens
 # using the LMTP protocol.
+
+##### MIAC_CONF_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars

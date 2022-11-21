@@ -5,13 +5,13 @@ source /etc/mailinabox.conf
 source setup/functions.sh # load our functions
 source setup/locale.sh # export locale env vars
 
-# Basic System Configuration
-# -------------------------
-
 ##### MIAC_BOILERPLATE_END
 
 
-##### MIAC_SYSTEMD_BEGIN
+##### MIAC_CONF_BEGIN
+
+# Basic System Configuration
+# -------------------------
 
 # ### Set hostname of the box
 
@@ -19,15 +19,15 @@ source setup/locale.sh # export locale env vars
 # errors during the install.
 #
 
-# Conditionalized because some VMs forbid changing the hostname -- for
-# these, PRIMARY_HOSTNAME must be set correctly
+# Conditionalized because some VMs forbid changing the hostname -- for these,
+# PRIMARY_HOSTNAME must be set correctly and this code is updating /etc/hostname
 if [[ "$PRIMARY_HOSTNAME" != "$(< /etc/hostname)" ]]; then
     # set the hostname in the configuration file, then activate the setting
     echo $PRIMARY_HOSTNAME > /etc/hostname
     hostname $PRIMARY_HOSTNAME
 fi
 
-##### MIAC_SYSTEMD_END
+##### MIAC_CONF_END
 
 
 ##### MIAC_GENERIC_BEGIN
@@ -205,6 +205,8 @@ if [ -z "${NONINTERACTIVE:-}" ]; then
 		restart_service rsyslog
 	fi
 else
+        # MIAC TODO: use MIAC_TIMEZONE
+
 	# This is a non-interactive setup so we can't ask the user.
 	# If /etc/timezone is missing, set it to UTC.
 	if [ ! -f /etc/timezone ]; then
@@ -213,6 +215,11 @@ else
 		restart_service rsyslog
 	fi
 fi
+
+##### MIAC_CONF_END
+
+
+##### MIAC_SSL_BEGIN
 
 # ### Seed /dev/urandom
 #
@@ -278,13 +285,22 @@ dd if=/dev/random of=/dev/urandom bs=1 count=32 2> /dev/null
 
 # Between these two, we really ought to be all set.
 
+
+##### MIAC_MOOT_BEGIN
+
+# MIAC ssl code is run in an ephemeral container, so no point in updating system files.
+# MIAC Instead we make a key that is stored in $STORAGE_ROOT/backup, see management.sh
+
 # We need an ssh key to store backups via rsync, if it doesn't exist create one
 if [ ! -f /root/.ssh/id_rsa_miab ]; then
 	echo 'Creating SSH key for backup…'
 	ssh-keygen -t rsa -b 2048 -a 100 -f /root/.ssh/id_rsa_miab -N '' -q
 fi
 
-##### MIAC_CONF_END
+##### MIAC_MOOT_END
+
+
+##### MIAC_SSL_END
 
 
 ##### MIAC_GENERIC_BEGIN

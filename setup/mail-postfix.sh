@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_CONF_BEGIN
 
 #!/bin/bash
 #
@@ -28,6 +28,11 @@
 # is configured in a separate setup script mail-users.sh
 # because of the overlap of this part with the Dovecot
 # configuration.
+
+##### MIAC_CONF_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars

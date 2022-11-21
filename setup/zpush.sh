@@ -1,4 +1,4 @@
-##### MIAC_BOILERPLATE_BEGIN
+##### MIAC_CONF_BEGIN
 
 #!/bin/bash
 #
@@ -11,6 +11,11 @@
 # so we won't install it that way.
 #
 # Thanks to http://frontender.ch/publikationen/push-mail-server-using-nginx-and-z-push.html.
+
+##### MIAC_CONF_END
+
+
+##### MIAC_BOILERPLATE_BEGIN
 
 source setup/functions.sh # load our functions
 source /etc/mailinabox.conf # load global vars

@@ -465,7 +465,11 @@ def build_sshfp_records():
 					pass
 				break
 
-	keys = shell("check_output", ["ssh-keyscan", "-t", "rsa,dsa,ecdsa,ed25519", "-p", str(port), "localhost"])
+        # MIAC support usage with no services running
+	code, keys = shell("check_output", ["ssh-keyscan", "-t", "rsa,dsa,ecdsa,ed25519", "-p", str(port), "localhost"], trap=True)
+	if code == 1: return
+
+	#keys = shell("check_output", ["ssh-keyscan", "-t", "rsa,dsa,ecdsa,ed25519", "-p", str(port), "localhost"])
 	keys = sorted(keys.split("\n"))
 
 	for key in keys:

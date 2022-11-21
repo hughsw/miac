@@ -56,12 +56,17 @@ apt_install curl php${PHP_VER} php${PHP_VER}-fpm \
 	php${PHP_VER}-dev php${PHP_VER}-gd php${PHP_VER}-xml php${PHP_VER}-mbstring php${PHP_VER}-zip php${PHP_VER}-apcu \
 	php${PHP_VER}-intl php${PHP_VER}-imagick php${PHP_VER}-gmp php${PHP_VER}-bcmath
 
+##### MIAC_INSTALL_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Enable APC before Nextcloud tools are run.
 tools/editconf.py /etc/php/$PHP_VER/mods-available/apcu.ini -c ';' \
 	apc.enabled=1 \
 	apc.enable_cli=1
 
-##### MIAC_INSTALL_END
+##### MIAC_GENERIC_END
 
 
 ##### MIAC_INSTALL_BEGIN
@@ -274,6 +279,7 @@ EOF
 	# Create an auto-configuration file to fill in database settings
 	# when the install script is run. Make an administrator account
 	# here or else the install can't finish.
+	# MIAC TODO: evaluate if MIAC_SSL_
 	adminpassword=$(dd if=/dev/urandom bs=1 count=40 2>/dev/null | sha1sum | fold -w 30 | head -n 1)
 	cat > /usr/local/lib/owncloud/config/autoconfig.php <<EOF;
 <?php
@@ -360,6 +366,11 @@ hide_output sudo -u www-data php$PHP_VER /usr/local/lib/owncloud/console.php app
 sudo -u www-data php$PHP_VER /usr/local/lib/owncloud/occ upgrade
 if [ \( $? -ne 0 \) -a \( $? -ne 3 \) ]; then exit 1; fi
 
+##### MIAC_CONF_END
+
+
+##### MIAC_GENERIC_BEGIN
+
 # Disable default apps that we don't support
 sudo -u www-data \
 	php$PHP_VER /usr/local/lib/owncloud/occ app:disable photos dashboard activity \
@@ -385,7 +396,7 @@ tools/editconf.py /etc/php/$PHP_VER/cli/conf.d/10-opcache.ini -c ';' \
 	opcache.save_comments=1 \
 	opcache.revalidate_freq=1
 
-##### MIAC_CONF_END
+##### MIAC_GENERIC_BEGIN
 
 
 ##### MIAC_MIGRATE_BEGIN

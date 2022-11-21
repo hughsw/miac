@@ -213,9 +213,10 @@ def get_duplicity_additional_args(env):
 	config = get_backup_config(env)
 
 	if get_target_type(config) == 'rsync':
+		# MIAC config['ssh_key_file'] was /root/.ssh/id_rsa_miab
 		return [
-			"--ssh-options= -i /root/.ssh/id_rsa_miab",
-			"--rsync-options= -e \"/usr/bin/ssh -oStrictHostKeyChecking=no -oBatchMode=yes -p 22 -i /root/.ssh/id_rsa_miab\"",
+			f"--ssh-options= -i {config['ssh_key_file']}",
+			f"--rsync-options= -e \"/usr/bin/ssh -oStrictHostKeyChecking=no -oBatchMode=yes -p 22 -i {config['ssh_key_file']}\"",
 		]
 	elif get_target_type(config) == 's3':
 		# See note about hostname in get_duplicity_target_url.
@@ -414,9 +415,10 @@ def list_target_files(config):
 		if target_path.startswith('/'):
 			target_path = target_path[1:]
 
+		# MIAC config['ssh_key_file'] was /root/.ssh/id_rsa_miab
 		rsync_command = [ 'rsync',
 					'-e',
-					'/usr/bin/ssh -i /root/.ssh/id_rsa_miab -oStrictHostKeyChecking=no -oBatchMode=yes',
+					f'/usr/bin/ssh -i {config["ssh_key_file"]} -oStrictHostKeyChecking=no -oBatchMode=yes',
 					'--list-only',
 					'-r',
 					rsync_target.format(
@@ -537,6 +539,11 @@ def get_backup_config(env, for_save=False, for_ui=False):
 	except:
 		pass
 
+	# MIAC consider security implications - it's a filename not a secret
+	ssh_key_file = os.path.join(backup_root, 'id_rsa_miab')
+	if os.path.exists(ssh_key_file):
+		config["ssh_key_file"] = ssh_key_file
+
 	# When updating config.yaml, don't do any further processing on what we find.
 	if for_save:
 		return config
@@ -554,9 +561,12 @@ def get_backup_config(env, for_save=False, for_ui=False):
 	if config["target"] == "local":
 		# Expand to the full URL.
 		config["target"] = "file://" + config["file_target_directory"]
-	ssh_pub_key = os.path.join('/root', '.ssh', 'id_rsa_miab.pub')
+
+	#ssh_pub_key = os.path.join('/root', '.ssh', 'id_rsa_miab.pub')
+	ssh_pub_key = os.path.join(backup_root, 'id_rsa_miab.pub')
 	if os.path.exists(ssh_pub_key):
 		config["ssh_pub_key"] = open(ssh_pub_key, 'r').read()
+
 
 	return config
 
