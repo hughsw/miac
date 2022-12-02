@@ -1,0 +1,8 @@
+system.sh
+
+#HSW rm -f /etc/resolv.conf
+if [ ! -e /etc/resolv.conf.orig ] ; then
+  cp /etc/resolv.conf /etc/resolv.conf.orig
+fi
+echo > /etc/resolv.conf
+

@@ -1,0 +1,15 @@
+diff --git a/setup/system.sh b/setup/system.sh
+index d0003f9..db48ac6 100755
+--- a/setup/system.sh
++++ b/setup/system.sh
+@@ -346,7 +346,9 @@ fi
+ # which is where bind9 will be running. Obviously don't do this before
+ # installing bind9 or else apt won't be able to resolve a server to
+ # download bind9 from.
+-rm -f /etc/resolv.conf
++# Overwrite (instead of rm) because some container environments bind
++# mount this file which makes it un-removeable
++echo > /etc/resolv.conf
+ tools/editconf.py /etc/systemd/resolved.conf DNSStubListener=no
+ echo "nameserver 127.0.0.1" > /etc/resolv.conf
+ 

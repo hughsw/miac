@@ -1,0 +1,11 @@
+#!/bin/bash
+
+set -euo pipefail
+trap 'rc=$?;set +ex;if [[ $rc -ne 0 ]];then trap - ERR EXIT;echo 1>&2;echo "*** fail *** : code $rc : $DIR/$SCRIPT $ARGS" 1>&2;echo 1>&2;exit $rc;fi' ERR EXIT
+ARGS="$*"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT="$(basename "${BASH_SOURCE[0]}")"
+
+set -x
+exec podman build -f sandbox3.df . -t sandbox
+#exec podman build --cap-add SYS_ADMIN --cap-add NET_ADMI -f sandbox2.df . -t sandbox

@@ -1,0 +1,55 @@
+FROM docker.io/library/ubuntu
+
+RUN apt-get update
+
+RUN DEBIAN_FRONTEND=noninteractive \
+  apt-get \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Options::=--force-confdef \
+    --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+    upgrade
+        
+#RUN echo y | unminimize
+
+RUN DEBIAN_FRONTEND=noninteractive \
+  apt-get \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Options::=--force-confdef \
+    --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+    install \
+      curl \
+      emacs-nox \
+      git \
+      locales \
+      screen \
+      ssh \
+      sudo \
+      systemd \
+      < /dev/null
+
+# Use systemd as command
+CMD ["/usr/bin/systemd"]
+
+
+RUN useradd -m -U miab
+RUN mkdir /home/miab/.ssh && chmod go-rwx /home/miab/.ssh
+COPY authorized_keys /home/miab/.ssh/
+RUN chown -R miab:miab /home/miab/.ssh
+COPY 010_miab-nopasswd /etc/sudoers.d/
+
+EXPOSE 80
+EXPOSE 53
+
+#RUN cat /etc/hostname && echo shed.tiny.hodain.net > /etc/hostname && cat /etc/hostname
+
+#RUN curl -s https://mailinabox.email/setup.sh | bash
+
+RUN curl -s https://mailinabox.email/setup.sh | sed -e 's|^setup/start.sh|#setup/start.sh|' | bash -x
+
+#COPY system.patch /tmp/
+#RUN cd $HOME/mailinabox && pwd && git apply /tmp/system.patch
+#RUN echo $HOME
+
+COPY system.patch mailinabox.env go.sh /root/
+
+#RUN cd /root && ./go.sh

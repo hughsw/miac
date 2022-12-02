@@ -1,0 +1,34 @@
+FROM docker.io/library/ubuntu
+
+RUN apt-get update
+
+RUN DEBIAN_FRONTEND=noninteractive \
+        apt-get \
+           -o Dpkg::Options::=--force-confold \
+           -o Dpkg::Options::=--force-confdef \
+           -y --allow-downgrades --allow-remove-essential --allow-change-held-packages install \
+             systemd \
+	     nginx \
+	     php-fpm
+
+# Enable the services
+#RUN systemctl enable php-fpm.service 
+RUN    systemctl enable nginx.service
+
+EXPOSE 80
+
+# Use systemd as command
+#CMD [ "/usr/sbin/init" ]
+CMD ["/usr/bin/systemd"]
+
+RUN DEBIAN_FRONTEND=noninteractive \
+        apt-get \
+           -o Dpkg::Options::=--force-confold \
+           -o Dpkg::Options::=--force-confdef \
+           -y --allow-downgrades --allow-remove-essential --allow-change-held-packages install \
+             ssh
+
+RUN useradd -m -U miab
+RUN mkdir /home/miab/.ssh && chmod go-rwx /home/miab/.ssh
+COPY authorized_keys /home/miab/.ssh/
+RUN chown -R miab:miab /home/miab/.ssh

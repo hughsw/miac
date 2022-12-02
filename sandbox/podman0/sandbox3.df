@@ -1,0 +1,169 @@
+FROM docker.io/library/ubuntu
+
+RUN true \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive \
+     apt-get \
+       -o Dpkg::Options::=--force-confold \
+       -o Dpkg::Options::=--force-confdef \
+       --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+       upgrade \
+       < /dev/null \
+  && true
+        
+#RUN echo y | unminimize
+
+RUN DEBIAN_FRONTEND=noninteractive \
+  apt-get \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Options::=--force-confdef \
+    --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+    install \
+      emacs-nox \
+      locales \
+      screen \
+      ssh \
+      sudo \
+      systemd \
+      < /dev/null
+
+# Use systemd as command
+CMD ["/usr/bin/systemd"]
+
+# Install stuff we know that mail-in-a-box needs -- speeds up its start.sh code
+
+RUN DEBIAN_FRONTEND=noninteractive \
+  apt-get \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Options::=--force-confdef \
+    --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+    install \
+      software-properties-common \
+    < /dev/null 
+
+RUN true \
+  && add-apt-repository -y universe \
+  && add-apt-repository -y ppa:duplicity-team/duplicity-release-git \
+  && add-apt-repository -y ppa:ondrej/php \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive \
+     apt-get \
+       -o Dpkg::Options::=--force-confold \
+       -o Dpkg::Options::=--force-confdef \
+       --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+       upgrade \
+       < /dev/null \
+  && true
+  
+RUN DEBIAN_FRONTEND=noninteractive \
+  apt-get \
+    -o Dpkg::Options::=--force-confold \
+    -o Dpkg::Options::=--force-confdef \
+    --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+    install \
+      bc \
+      bind9 \
+      bind9-host \
+      ca-certificates \
+      certbot \
+      coreutils \
+      cron \
+      curl \
+      dbconfig-common \
+      dovecot-antispam \
+      dovecot-core \
+      dovecot-imapd \
+      dovecot-lmtpd \
+      dovecot-managesieved \
+      dovecot-pop3d \
+      dovecot-sieve \
+      dovecot-sqlite \
+      duplicity \
+      fail2ban \
+      file \
+      git \
+      idn2 \
+      ldnsutils \
+      libawl-php \
+      libcgi-fast-perl \
+      libjs-jquery \
+      libjs-jquery-mousewheel \
+      libmagic1 \
+      libmail-dkim-perl \
+      munin \
+      munin-node \
+      netcat-openbsd \
+      nginx \
+      nsd \
+      ntp \
+      opendkim \
+      opendkim-tools \
+      opendmarc \
+      openssh-client \
+      openssl \
+      php8.0 \
+      php8.0-apcu \
+      php8.0-bcmath \
+      php8.0-cli \
+      php8.0-common \
+      php8.0-curl \
+      php8.0-dev \
+      php8.0-fpm \
+      php8.0-gd \
+      php8.0-gmp \
+      php8.0-imagick \
+      php8.0-imap \
+      php8.0-intl \
+      php8.0-mbstring \
+      php8.0-pspell \
+      php8.0-soap \
+      php8.0-sqlite3 \
+      php8.0-xml \
+      php8.0-zip \
+      pollinate \
+      postfix \
+      postfix-pcre \
+      postfix-sqlite \
+      postgrey \
+      python3 \
+      python3-dev \
+      python3-pip \
+      python3-setuptools \
+      pyzor \
+      razor \
+      rsync \
+      rsyslog \
+      sed \
+      spampd \
+      sqlite3 \
+      sudo \
+      ufw \
+      unattended-upgrades \
+      unzip \
+      virtualenv \
+      wget \
+      < /dev/null
+
+
+RUN useradd -m -U miab
+RUN mkdir /home/miab/.ssh && chmod go-rwx /home/miab/.ssh
+COPY authorized_keys /home/miab/.ssh/
+RUN chown -R miab:miab /home/miab/.ssh
+COPY 010_miab-nopasswd /etc/sudoers.d/
+
+EXPOSE 80
+EXPOSE 53
+
+#RUN cat /etc/hostname && echo shed.tiny.hodain.net > /etc/hostname && cat /etc/hostname
+
+#RUN curl -s https://mailinabox.email/setup.sh | bash
+
+RUN curl -s https://mailinabox.email/setup.sh | sed -e 's|^setup/start.sh|#setup/start.sh|' | bash -x
+
+#COPY system.patch /tmp/
+#RUN cd $HOME/mailinabox && pwd && git apply /tmp/system.patch
+#RUN echo $HOME
+
+COPY system.patch mailinabox.env go.sh /root/
+
+#RUN cd /root && ./go.sh
