@@ -1,0 +1,26 @@
+# useradd hugh
+
+# E.g.
+# cp -a ~/.ssh ~hugh/
+# chown -R hugh:hugh ~hugh/.ssh
+
+# cat /etc/sudoers.d/010_hugh-nopasswd
+hugh	ALL=(ALL)	NOPASSWD: ALL
+
+# cat /etc/sysctl.d/local.conf
+# this file: /etc/sysctl.d/local.conf
+#
+# reload with:
+#   sysctl -p /etc/sysctl.d/local.conf
+
+#net.ipv4.ip_unprivileged_port_start=0
+net.ipv4.ip_unprivileged_port_start=20
+net.ipv6.conf.all.disable_ipv6 = 1
+
+
+[root@tinybook ~]# systemctl disable --now systemd-resolved.service
+Removed "/etc/systemd/system/sysinit.target.wants/systemd-resolved.service".
+Removed "/etc/systemd/system/dbus-org.freedesktop.resolve1.service".
+
+in /etc/selinux/config
+SELINUX=disabled
