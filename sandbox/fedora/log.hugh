@@ -1,25 +1,42 @@
 podman pull docker.io/hughsw/miac-miab:v60.1miac1
 
-
-
-[hugh@localhost miac]$ history
+[hugh@tinybook fedora]$ history
     1  exec screen -mAROD -e^^^^
     2  exec emacs
-    3  sudo ls -la
-    4  podman run -it --rm -p 25:25 hello-world
+    3  exec sudo --login
+    4  sudo ls -la
     5  pwd
     6  cd miac/
     7  podman pull docker.io/hughsw/miac-miab:v60.1miac1
-    8  ./miac miab:v60.1miac1 shed.cochleaudio.com
-    9  podman container rm miac-miab
-   10  ./miac miab:v60.1miac1 shed.cochleaudio.com
-   11  exec screen -mAROD -e^^^^
-   12  exec emacs
-   13  podman pull docker.io/hughsw/miac-miab:v60.1miac1
-   14  podman container rm miac-miab
-   15  ./miac miab:v60.1miac1 shed.cochleaudio.com
-   16  cd github/miac/
-   17  git fetch
-   18  git checkout sandbox
-   19  history
-[hugh@localhost miac]$
+    8  cd sandbox/fedora/
+    9  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   10  podman container rm miac-miab
+   11  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   12  exec screen -mAROD -e^^^^
+   13  exec emacs
+   14  exec screen -mAROD -e^^^^
+   15  exec sudo --login
+   16  exec screen -mAROD -e^^^^
+   17  history
+   18  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   19  exec screen -mAROD -e^^^^
+   20  exec emacs
+   21  exec sudo --login
+   22  sudo systemctl stop firewalld
+   23  cd miac/
+   24  history
+   25  podman container rm miac-miab
+   26  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   27  ls
+   28  cd sandbox/fedora/
+   29  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   30  podman container rm miac-miab
+   31  podman run -d -p 8080:80 docker.io/traefik/whoami
+   32  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   33  podman container rm miac-miab
+   34  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   35  podman pull docker.io/hughsw/miac-miab:v60.1miac1
+   36  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   37  podman container rm miac-miab
+   38  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   39  podman container rm miac-miab

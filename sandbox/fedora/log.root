@@ -1,3 +1,38 @@
+[root@tinybook ~]# history
+ 1 which screen
+ 2 df -h
+ 3 ps ax
+ 4 ps ax | fgrep -v ' ['
+ 5 cat /etc/resolv.conf
+ 6 systemctl status
+ 7 yum --help
+ 8 yum install emacs-nox
+ 9 yum install screen
+ 10 which screen
+  11 yum search screen
+ 12 yum update
+ 13 which git
+ 14 yum install git
+ 15 yum install epel-release
+  16 yum install screen
+ 17 exec screen -mAROD -e^^^^
+ 18 exec emacs
+  19 yum upgrade
+ 20 df -h
+ 21 cd
+ 22 cp -a ~/.ssh ~hugh/
+ 23 chown -R hugh:hugh ~hugh/.ssh
+  24 yum install podman
+ 25 exec emacs
+ 26 dnf install slirp4net
+  27 dnf install slirp4netns
+ 28 history
+ 29 exec emacs
+ 30 w
+ 31 history
+ 32 systemctl stop firewalld
+
+
 # useradd hugh
 
 # E.g.
@@ -24,3 +59,6 @@ Removed "/etc/systemd/system/dbus-org.freedesktop.resolve1.service".
 
 in /etc/selinux/config
 SELINUX=disabled
+
+
+

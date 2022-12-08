@@ -29,6 +29,7 @@ shift
 
 set -x
 exec podman run \
+     --pull=newer \
      --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add CAP_NET_RAW \
      -p 2222:22 \
      -p 25:25 \
