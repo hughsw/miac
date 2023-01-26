@@ -1,5 +1,1 @@
 alias scr="exec screen -mAROD -e^^^^"
-
-echo
-alias -p
-echo

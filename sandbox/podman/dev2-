@@ -23,23 +23,27 @@ shift
 
 set -x
 exec podman run \
+     --replace \
      --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add CAP_NET_RAW \
      -p 2222:22 \
-     -p 25:25 \
-     -p 53:53/udp \
-     -p 53:53 \
-     -p 80:80 \
-     -p 443:443 \
-     -p 465:465 \
-     -p 587:587 \
-     -p 993:993 \
-     -p 995:995 \
-     -p 4190:4190 \
      -it \
-     -v ${HOME}/.ssh/authorized_keys:/home/miac/.ssh/authorized_keys:ro \
      -h $MIAC_PRIMARY_HOSTNAME \
      --name miac-${tag} \
      miac-${tag} "$@"
+
+#     -v $(pwd)/authorized_keys:/home/miac/.ssh/authorized_keys:ro \
+
+#     -v ${HOME}/.ssh/authorized_keys:/home/miac/.ssh/authorized_keys:ro \
+#     -p 25:25 \
+#     -p 53:53/udp \
+#     -p 53:53 \
+#     -p 80:80 \
+#     -p 443:443 \
+#     -p 465:465 \
+#     -p 587:587 \
+#     -p 993:993 \
+#     -p 995:995 \
+#     -p 4190:4190 \
 
 #     --user miac:miac \
 #     -v ${HOME}/.ssh/id_rsa:/home/miac/.ssh/id_rsa:ro \

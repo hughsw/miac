@@ -14,6 +14,6 @@ shift
 MIAC_MIAB_TAG=v60.1miac1
 
 set -x
-exec podman build --build-arg=TAG=$MIAC_MIAB_TAG -f miac-${tag}.df -t miac-${tag} "$@"
+exec podman build --arch=arm --build-arg=TAG=$MIAC_MIAB_TAG -f miac-${tag}.df -t miac-${tag} "$@"
 
 #exec podman build --build-arg=MIAC_SSH_KEY="$MIAC_SSH_KEY" -f miac-${tag}.df -t miac-${tag} "$@"

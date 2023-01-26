@@ -36,53 +36,57 @@ RUN true \
 
 RUN true \
   && systemctl enable systemd-networkd \
-  && systemctl disable systemd-timesyncd \
   && locale-gen en_US.UTF-8 \
   && rm -f /etc/update-motd.d/60-unminimize \
   && true
 
+#  && systemctl disable systemd-timesyncd \
 #        networkd-dispatcher \
-
 #  && systemctl disable exim4.service exim4.timer \
 
 # Use systemd as command
 CMD ["/usr/bin/systemd"]
 
+# prevent podman qemu failure on systemd-sysusers.service
+# https://github.com/systemd/systemd/issues/21511#issuecomment-978979116
+# https://www.mail-archive.com/ubuntu-bugs@lists.ubuntu.com/msg5975017.html
+COPY sysusers-override.conf /etc/systemd/system/systemd-sysusers.service.d/
+
 # Base Ubuntu system system is ready
 
-# MIAC login motd
+# NED login motd
 RUN chmod -x /etc/update-motd.d/* && mv /etc/legal /etc/legal.ORIG
-COPY 40-miac 50-miac /etc/update-motd.d/
+COPY 40-ned 50-ned /etc/update-motd.d/
 
-# Add user: miac, public key login only
-# Recommended that podman run mount your authorized_keys read-only to /home/miac/.ssh/authorized_keys
+# Add user: ned, public key login only
+# Recommended that podman run mount your authorized_keys read-only to /home/ned/.ssh/authorized_keys
 
-COPY 010_miac-nopasswd /etc/sudoers.d/
-COPY bashrc /home/miac/.bash_login
+COPY 010_ned-nopasswd /etc/sudoers.d/
+COPY bashrc /home/ned/.bash_login
 RUN true \
-  && useradd --shell /bin/bash --user-group miac \
-  && mkdir -p --mode go-rwx /home/miac/.ssh \
-  && chown -R miac:miac /home/miac \
+  && useradd --shell /bin/bash --user-group ned \
+  && mkdir -p --mode go-rwx /home/ned/.ssh \
+  && chown -R ned:ned /home/ned \
   && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
   && true
 
-# auto miac login on podman console
+# auto ned login on podman console
 RUN true \
-  && sed -i 's/ --noclear / --noclear --autologin miac /' /lib/systemd/system/console-getty.service \
-  && sed -i '1s|^|auth sufficient pam_listfile\.so item=tty sense=allow file=/etc/securetty onerr=fail apply=miac\n|' /etc/pam.d/login \
+  && sed -i 's/ --noclear / --noclear --autologin ned /' /lib/systemd/system/console-getty.service \
+  && sed -i '1s|^|auth sufficient pam_listfile\.so item=tty sense=allow file=/etc/securetty onerr=fail apply=ned\n|' /etc/pam.d/login \
   && echo console >> /etc/securetty \
   && true
 
 ARG TAG
 
 # TODO: abstract the key to an env var...
-COPY authorized_keys /home/miac/.ssh/
+COPY --chown=ned:ned authorized_keys /home/ned/.ssh/
 
-#  && echo "${MIAC_SSH_KEY}" > /home/miac/.ssh/authorized_keys \
-#  && chmod go-rwx /home/miac/.ssh/authorized_keys \
 
-#  && chmod go-rwx /home/miac/.ssh \
+#  && echo "${NED_SSH_KEY}" > /home/ned/.ssh/authorized_keys \
+#  && chmod go-rwx /home/ned/.ssh/authorized_keys \
+#  && chmod go-rwx /home/ned/.ssh \
 #  --create-home
 
 
-# Fairly unopinionated Ubuntu system at this point, systemd and thus logins, and with user miac who has sudo
+# Fairly unopinionated Ubuntu system at this point, systemd and thus logins, and with user ned who has sudo

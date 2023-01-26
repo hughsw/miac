@@ -1,0 +1,6 @@
+time drift
+https://stackoverflow.com/questions/69736393/podman-push-not-verbose-and-vm-out-of-sync
+$ podman machine ssh "sudo systemctl restart systemd-timesyncd.service"
+
+podman machine stop
+podman machine start
