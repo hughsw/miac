@@ -1,0 +1,543 @@
+    1  git checkout mailinabox/main
+    2  git checkout main
+    3  git checkout -b miab
+    4  cd ..
+    5  podman rm miac-miab && podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+    6  ./dev- miab shed.cochleaudio.com
+    7  podman rm miac-miab && podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+    8  ./dev- miab shed.cochleaudio.com
+    9  podman rm miac-miab && podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+   10  ./dev- miab shed.cochleaudio.com
+   11  podman rm miac-miab && podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+   12  ./dev- miab shed.cochleaudio.com
+   13  podman tag miac-miab docker.io/hughsw/miac-miab
+   14  podman push docker.io/hughsw/miac-miab
+   15  podman login hughsw
+   16  podman login -u hughsw -p hc2X3s4S 
+   17  podman login -u hughsw -p hc2X3s4S docker.io
+   18  podman push docker.io/hughsw/miac-miab
+   19  podman run --replace -it docker.io/library/ubuntu:22.04 
+   20  podman run --replace -it --name ubuntu docker.io/library/ubuntu:22.04 
+   21  podman run --rm quay.io/podman/hello
+   22  pwd
+   23  cd miac
+   24  ls -la
+   25  hostname
+   26  cd
+   27  pwd
+   28  ls -la
+   29  cd work
+   30  cd miac/
+   31  ls -la
+   32  pwd
+   33  ./bootstrap.sh 
+   34  rmdir /home/hugh/miac/
+   35  ./bootstrap.sh 
+   36  pushd /tmp
+   37  ls -la
+   38  mkdir foon 
+   39  cd foon
+   40  touch barn
+   41  cd ..
+   42  rmdir foon
+   43  rmdir foon > /dev/null
+   44  rmdir foon 2> /dev/null
+   45  popd
+   46  ./bootstrap.sh 
+   47  podman run --rm miac-flat ls -la /home/user-data
+   48  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   49  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   50  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   51  ./bootstrap.sh 
+   52  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   53  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   54  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   55  ./bootstrap.sh 
+   56  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   57  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   58  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   59  ./bootstrap.sh 
+   60  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   61  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   62  ./bootstrap.sh 
+   63  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   64  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat cat /home/user-data/miac-env.sh
+   65  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   66  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   67  ./bootstrap.sh 
+   68  date '+%Y-%m-%d-%H%M-%S'
+   69  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   70  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat cat /home/user-data/miac.timestamp
+   71  echo ${HOME}
+   72  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   73  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   74  ./bootstrap.sh 
+   75  podman ps
+   76  podman attach miac-flat
+   77  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat ls -la /home/user-data
+   78  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   79  ./bootstrap.sh 
+   80  podman container rm miac-flat
+   81  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   82  ./bootstrap.sh 
+   83  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   84  ./bootstrap.sh 
+   85  podman container rm miac-flat
+   86  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   87  ./bootstrap.sh 
+   88  podman container rm miac-flat
+   89  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   90  ./bootstrap.sh 
+   91  podman container rm miac-flat
+   92  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+   93  ./bootstrap.sh 
+   94  podman ps
+   95  podman exec -it miac-flat bash --login
+   96  cd miab
+   97  git status
+   98  git add --patch management/backup.py 
+   99  git status
+  100  git add --patch -- management tools/
+  101  git status
+  102  git commit -m 'chore(python open): Refactor open and gzip.open to use context manager'
+  103  git diff
+  104  git add -u
+  105  git status
+  106  git commit -m 'chore(python lint): Convert spaces to tab to eliminate py_compile complaints'
+  107  git push
+  108  cd ..
+  109  ./bootstrap2.sh 
+  110  podman ps
+  111  ./bootstrap2.sh 
+  112  podman exec -it miac-flat /bin/bash --login
+  113  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  114  ./bootstrap2.sh 
+  115  printenv | fgrep TERM
+  116  ./bootstrap2.sh 
+  117  podman container kill miac-flat
+  118  podman container rm miac-flat
+  119  ./bootstrap2.sh 
+  120  podman container kill miac-flat
+  121  podman container rm miac-flat
+  122  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  123  ./bootstrap2.sh 
+  124  podman container kill miac-flat
+  125  podman container rm miac-flat
+  126  ./bootstrap2.sh 
+  127  podman ps
+  128  podman container kill miac-flat
+  129  podman container rm miac-flat
+  130  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  131  podman container kill miac-flat
+  132  podman container rm miac-flat
+  133  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  134  ./bootstrap2.sh 
+  135  podman container kill miac-flat
+  136  podman container rm miac-flat
+  137  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  138  ./bootstrap2.sh 
+  139  podman container kill miac-flat
+  140  podman container rm miac-flat
+  141  ./bootstrap2.sh 
+  142  podman container kill miac-flat
+  143  podman container rm miac-flat
+  144  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  145  ./bootstrap2.sh 
+  146  podman container kill miac-flat
+  147  podman container rm miac-flat
+  148  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  149  ./bootstrap2.sh 
+  150  podman container kill miac-flat
+  151  podman container rm miac-flat
+  152  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  153  ./bootstrap2.sh 
+  154  podman container kill miac-flat
+  155  podman container rm miac-flat
+  156  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  157  ./bootstrap2.sh 
+  158  podman container kill miac-flat
+  159  podman container rm miac-flat
+  160  ./bootstrap2.sh 
+  161  podman container kill miac-flat
+  162  podman container rm miac-flat
+  163  ./bootstrap2.sh 
+  164  podman container kill miac-flat
+  165  podman container rm miac-flat
+  166  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  167  ./bootstrap2.sh 
+  168  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  169  podman container kill miac-flat
+  170  podman container rm miac-flat
+  171  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  172  ./bootstrap2.sh 
+  173  podman container kill miac-flat
+  174  podman container rm miac-flat
+  175  ./bootstrap2.sh 
+  176  podman container kill miac-flat
+  177  podman container rm miac-flat
+  178  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  179  ./bootstrap2.sh 
+  180  git rebase -i
+  181  cd miab
+  182  git config --global core.editor emacs
+  183  git rebase -i
+  184  git rebase -i main
+  185  cd ..
+  186  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  187  podman container kill miac-flat
+  188  podman container rm miac-flat
+  189  ./bootstrap2.sh base
+  190  ./bootstrap2.sh stock
+  191  podman ps
+  192  podman kill miac-base
+  193  podman container rm miac-base
+  194  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  195  ./bootstrap2.sh stock
+  196  podman kill miac-stock
+  197  podman container rm miac-stock
+  198  podman run --rm -v /home/hugh/miac:/home/user-data miac-flat rm -r /home/user-data
+  199  ./bootstrap2.sh stock
+  200  podman kill miac-stock
+  201  podman container rm miac-stock
+  202  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  203  podman ps
+  204  ./bootstrap2.sh stock
+  205  podman kill miac-stock
+  206  podman container rm miac-stock
+  207  podman ps
+  208  podman container ls -a
+  209  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  210  ./bootstrap2.sh flat
+  211  podman kill miac-flat
+  212  podman container rm miac-flat
+  213  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  214  ./bootstrap2.sh flat
+  215  podman kill miac-flat
+  216  podman container rm miac-flat
+  217  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  218  ./bootstrap2.sh flat
+  219  podman kill miac-flat
+  220  podman container rm miac-flat
+  221  ./bootstrap2.sh flat
+  222  admin_pw2=$(podman run -it --rm --env TERM=screen.xterm-256color miac-flat ./test-dialog.sh)
+  223  admin_pw2=$(podman run -it --rm --env TERM=screen.xterm-256color miac-flat setup/test-dialog.sh)
+  224  echo $admin_pw2
+  225  echo "$admin_pw2"
+  226  podman kill miac-flat
+  227  podman container rm miac-flat
+  228  ./bootstrap2.sh flat
+  229  admin_pw2=$(podman run -it --rm --env TERM=screen.xterm-256color miac-flat setup/test-dialog.sh)
+  230  podman run -it --rm --env TERM=screen.xterm-256color miac-flat setup/test-dialog.sh
+  231  podman run -it --rm  miac-flat printenv | sort 
+  232  podman kill miac-flat
+  233  podman ps
+  234  podman container rm miac-flat
+  235  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  236  ./bootstrap2.sh flat
+  237  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  238  ./bootstrap2.sh flat
+  239  podman ps
+  240  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  241  ./bootstrap2.sh flat
+  242  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  243  ./bootstrap2.sh flat
+  244  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  245  ./bootstrap2.sh flat
+  246  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  247  ./bootstrap2.sh flat
+  248  podman run -it --rm miac-flat bash --login
+  249  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  250  ./bootstrap2.sh flat
+  251  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  252  ./bootstrap2.sh flat
+  253  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  254  ./bootstrap2.sh flat
+  255  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  256  ./bootstrap2.sh flat
+  257  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  258  ./bootstrap2.sh flat
+  259  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  260  ./bootstrap2.sh flat
+  261  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  262  ./bootstrap2.sh flat
+  263  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  264  ./bootstrap2.sh flat
+  265  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  266  ./bootstrap2.sh flat
+  267  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  268  ./bootstrap2.sh flat
+  269  podman run -it --rm miac-flat bash --login
+  270  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  271  ./bootstrap2.sh flat
+  272  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  273  ./bootstrap2.sh flat
+  274  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  275  ./bootstrap2.sh flat
+  276  podman ps
+  277  podman stop miac-flat
+  278  podman rm miac-flat
+  279  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  280  ./bootstrap2.sh flat2
+  281  podman ps
+  282  podman exec -it miac-flat2 /bin/bash --login
+  283  podman stop miac-flat2
+  284  podman rm miac-flat2
+  285  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  286  ./bootstrap2.sh flat2
+  287  podman stop miac-flat2
+  288  podman rm miac-flat2
+  289  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  290  ./bootstrap2.sh flat2
+  291  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  292  ./bootstrap2.sh flat2
+  293  podman stop miac-flat2
+  294  podman rm miac-flat2
+  295  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  296  ./bootstrap2.sh flat2
+  297  podman stop miac-flat2
+  298  podman rm miac-flat2
+  299  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  300  ./bootstrap2.sh flat2
+  301  podman stop miac-flat2
+  302  podman rm miac-flat2
+  303  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  304  ./bootstrap2.sh flat2
+  305  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  306  ./bootstrap2.sh flat2
+  307  podman stop miac-flat2
+  308  podman rm miac-flat2
+  309  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  310  ./bootstrap2.sh flat2
+  311  podman stop miac-flat2
+  312  podman rm miac-flat2
+  313  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  314  ./bootstrap2.sh flat2
+  315  podman kill miac-flat2
+  316  podman rm miac-flat2
+  317  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  318  ./bootstrap2.sh flat2
+  319  podman kill miac-flat2
+  320  podman rm miac-flat2
+  321  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  322  ./bootstrap2.sh flat2
+  323  podman kill miac-flat2
+  324  podman rm miac-flat2
+  325  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  326  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  327  podman kill miac-flat2
+  328  podman rm miac-flat2
+  329  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  330  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  331  podman kill miac-flat2
+  332  podman rm miac-flat2
+  333  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  334  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  335  podman kill miac-flat2
+  336  podman rm miac-flat2
+  337  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  338  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  339  podman kill miac-flat2
+  340  podman rm miac-flat2
+  341  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  342  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  343  podman kill miac-flat2
+  344  podman rm miac-flat2
+  345  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  346  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  347  podman kill miac-flat2
+  348  podman rm miac-flat2
+  349  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  350  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  351  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  352  ./bootstrap2.sh flat2 2>&1 | tee --output-error=exit logs/bootstrap2.log_$(date '+%Y-%m-%d-%H%M-%S')
+  353  podman stop miac-flat2
+  354  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  355  podman ps
+  356  podman exec -it -u miac -g miac miac-miab bash --login
+  357  podman exec -it -u miac  miac-miab bash --login
+  358  exec screen -mAROD -e^^^^
+  359  exec emacs
+  360  exec screen -mAROD -e^^^^
+  361  exec sudo --login
+  362  exec screen -mAROD -e^^^^
+  363  pwd
+  364  podman pull docker.io/library/ubuntu:22.04
+  365  ./build- miab
+  366  ./build- base
+  367  ./build- install
+  368  ./build- miab
+  369  ./build- base
+  370  ./build- install
+  371  ./build- miab
+  372  podman image rm miac-miab
+  373  ./build- miab
+  374  podman tag miac-miab docker.io/hughsw/miac-miab:v60.1miac1
+  375  podman push docker.io/hughsw/miac-miab:v60.1miac1
+  376  podman login -u hughsw -p hc2X3s4S
+  377  podman login -u hughsw -p hc2X3s4S docker.io
+  378  podman push docker.io/hughsw/miac-miab:v60.1miac1
+  379  ./build- miab
+  380  podman container rm miac-miab
+  381  history >/tmp/hist
+  382  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  383  ./dev- miab shed.cochleaudio.com
+  384  ./build- base
+  385  ./build- install
+  386  ./build- miab
+  387  podman container rm miac-miab
+  388  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  389  podman container rm miac-miab
+  390  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  391  pwd
+  392  cd /home/hugh/work/miac
+  393  podman container rm miac-miab
+  394  podman run --rm -v /home/hugh/miac:/home/user-data miac-base rm -r /home/user-data
+  395  ./build- miab
+  396  podman push docker.io/hughsw/miac-miab:v60.1miac1
+  397  ./build- base
+  398  ./build- install
+  399  hugh@localhost:~/work/miac$ 
+  400  ./build- install
+  401  ./build- base
+  402  ./build- install
+  403  ./build- miab
+  404  podman tag miac-miab hughsw/miac-miab:v60.1miac1
+  405  podman push docker.io/hughsw/miac-miab:v60.1miac1
+  406  ./dev- miab shed.cochleaudio.com
+  407  podman tag miac-miab docker.io/hughsw/miac-miab:v60.1miac1
+  408  podman push docker.io/hughsw/miac-miab:v60.1miac1
+  409  pwd
+  410  cd
+  411  cd work/rsyncem/
+  412  ./rsem ca/audio/rev-02/2022/2022-07-22
+  413  ./rsem ca/audio/rev-02/2022/2022-07-22/
+  414  ./go.sh
+  415  df -h
+  416  ./go.sh
+  417  df -h
+  418  pwd
+  419  cd work/miac/
+  420  exec screen -mAROD -e^^^^
+  421  exec emacs
+  422  pwd
+  423  rsync -av . /mnt/temp/rsyncem/
+  424  rsync -av --checksum . /mnt/temp/rsyncem/
+  425  cd
+  426  cd /mnt/temp/rsyncem/
+  427  ls -la
+  428  ./go.sh 
+  429  df -h
+  430  ./go.sh 
+  431  exec screen -mAROD -e^^^^
+  432  exec emacs
+  433  exec screen -mAROD -e^^^^
+  434  ./go.sh 
+  435  ssh -o StrictHostKeyChecking=no -p 23 u315483@u315483.your-storagebox.de rm -rv ca/audio/rev-00/audio/ambient_48kHz-1c-16bit_86%_TONOR-TC30-Audio-Device_Olimex-A20-OLinuXino-LIME2-eMMC_2022-07-12_1004-17.flac/
+  436  ./go.sh 
+  437  rsync -av -e "ssh  -o StrictHostKeyChecking=no"  ./go.sh de2027@de2027.rsync.net:ca/audio/
+  438  ./go.sh 
+  439  exec screen -mAROD -e^^^^
+  440  exec emacs
+  441  sudo ls
+  442  exec screen -mAROD -e^^^^
+  443  exec emacs
+  444  exec screen -mAROD -e^^^^
+  445  exit
+  446  exec sudo --login
+  447  sudo ls -la
+  448  exit
+  449  scr
+  450  ls -la
+  451  cat > .bash_login
+  452  exit
+  453  scr
+  454  exec sudo su -
+  455  exec login root
+  456  cd work/cochleaudio/wd
+  457  ./run wd5 -- podman docker.io/hughsw
+  458  ./build wd5-base -- podman
+  459  exit
+  460  pwd
+  461  cd ..
+  462  git status
+  463  git push
+  464  git fetch
+  465  co status-summary
+  466  git checkout   status-summary
+  467  git merge
+  468  pwd
+  469  cd ../..
+  470  git clone ca@git.hodain.net:/srv/ca/cochleaudio.git
+  471  which podman
+  472  cd cochleaudio/wd
+  473  ./run wd5 -- podman hughsw
+  474  ./run wd5 -- podman docker.io/hughsw
+  475  exit
+  476  scr
+  477  exec emacs
+  478  pwd
+  479  rm -r *
+  480  df 
+  481  pwd
+  482  cd
+  483  cd work/
+  484  git clone ca@git.hodain.net:/srv/ca/ca-target.git
+  485  cd work/cochleaudio/wd
+  486  cat build
+  487  #./build wd5-base -- podman
+  488  podman images
+  489  podman system prune --force
+  490  podman images | awk '{print $3}' | xargs podman rmi
+  491  podman images
+  492  ./build wd5-base -- podman
+  493  ./buildx wd5-base -- podman
+  494  ./build wd5-base -- podman
+  495  exit
+  496  scr
+  497  exec emacs
+  498  scr
+  499  pwd
+  500  curl -sSL -O 'https://www.amd.com/en/developer/uprof/uprof-eula.html?filename=amduprof_4.1-424_amd64.deb'
+  501  curl -sSL 'https://www.amd.com/en/developer/uprof/uprof-eula.html?filename=amduprof_4.1-424_amd64.deb'
+  502  curl -sSLk 'https://www.amd.com/en/developer/uprof/uprof-eula.html?filename=amduprof_4.1-424_amd64.deb'
+  503  curl -sSLk -i 'https://www.amd.com/en/developer/uprof/uprof-eula.html?filename=amduprof_4.1-424_amd64.deb'
+  504  curl -sSLk -i 'https://www.amd.com/en/developer/uprof/uprof-eula.html'
+  505  curl -sSLk O --form filename=amduprof_4.1-424_amd64.deb  'https://www.amd.com/en/developer/uprof/uprof-eula.html'
+  506  curl -sSLk -O --form filename=amduprof_4.1-424_amd64.deb  'https://www.amd.com/en/developer/uprof/uprof-eula.html'
+  507  curl -sSLk -O -i --form filename=amduprof_4.1-424_amd64.deb  'https://www.amd.com/en/developer/uprof/uprof-eula.html'
+  508  curl -sSLk -O https://download.amd.com/developer/eula/uprof/amduprof_4.1-424_amd64.deb
+  509  sudo dpkg --install amduprof_x.y-z_amd64.deb
+  510  pwd
+  511  sudo dpkg --install amduprof_4.1-424_amd64.deb
+  512  sudo apt-get install linux-headers-5.10.0-26-amd64
+  513  sudo dpkg --install amduprof_4.1-424_amd64.deb
+  514  sudo apt-get install make
+  515  sudo dpkg --install amduprof_4.1-424_amd64.deb
+  516  sudo apt-get install make gcc
+  517  sudo dpkg --install amduprof_4.1-424_amd64.deb
+  518  sudo apt-get install make gcc bcc
+  519  sudo dpkg --install amduprof_4.1-424_amd64.deb
+  520  sudo apt-get remove  bcc
+  521  sudo apt-get install -y bpfcc-tools libbpfcc 
+  522  sudo apt-get autoremove
+  523  sudo dpkg --install amduprof_4.1-424_amd64.deb
+  524  pushd /opt
+  525  ls
+  526  cd AMDuProf_4.1-424/bin/
+  527  ./AMDuProfVerifyBpfInstallation.sh 
+  528  sudo ./AMDuProfVerifyBpfInstallation.sh 
+  529  cd
+  530  sudo dash -c 'echo 0 > /proc/sys/kernel/nmi_watchdog'
+  531  sudo dash -c 'echo -1 > /proc/sys/kernel/perf_event_paranoid'
+  532  sudo modprobe msr
+  533  dirs
+  534  pushd
+  535  sudo AMDuProfPcm -m memory -a -d 10 -o /tmp/memdata.txt -- /capyvenv/bin/python3 go6.py 
+  536  sudo /opt/AMDuProf_4.1-424/bin/AMDuProfPcm -m memory -a -d 10 -o /tmp/memdata.txt -- /capyvenv/bin/python3 go6.py 
+  537  sudo apt-get install libnuma-dev
+  538  sudo /opt/AMDuProf_4.1-424/bin/AMDuProfPcm -m memory -a -d 10 -o /tmp/memdata.txt -- /capyvenv/bin/python3 go6.py 
+  539  sudo /opt/AMDuProf_4.1-424/bin/AMDuProfPcm -m dc -a -d 30 -o /tmp/memdata.txt -- /capyvenv/bin/python3 go6.py 
+  540  dirs
+  541  pushd
+  542  cd /opt/AMDuProf_4.1-424/bin/
+  543  history >> ~/history.txt
