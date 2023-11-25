@@ -1,0 +1,49 @@
+#!/bin/bash
+
+# Start MIAC podman container:
+# $ ./dev- miab shed.cochleaudio.com
+
+set -euo pipefail
+trap 'rc=$?;set +ex;if [[ $rc -ne 0 ]];then trap - ERR EXIT;echo 1>&2;echo "*** fail *** : code $rc : $DIR/$SCRIPT $ARGS" 1>&2;echo 1>&2;exit $rc;fi' ERR EXIT
+ARGS="$*"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT="$(basename "${BASH_SOURCE[0]}")"
+
+# Edit /etc/sysctl.d/local.conf to set net.ipv4.ip_unprivileged_port_start so podman can open low-number ports
+# /etc/sysctl.d/local.conf 
+#   net.ipv4.ip_unprivileged_port_start=20
+
+# and be sure to disable/stop any services that are using these ports (other than ssh/22)
+
+tag=$1
+shift
+
+MIAC_PRIMARY_HOSTNAME=$1
+shift
+
+set -x
+exec podman run \
+     --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add CAP_NET_RAW \
+     -p 2222:22 \
+     -p 25:25 \
+     -p 53:53/udp \
+     -p 53:53 \
+     -p 80:80 \
+     -p 443:443 \
+     -p 465:465 \
+     -p 587:587 \
+     -p 993:993 \
+     -p 995:995 \
+     -p 4190:4190 \
+     -it \
+     -v ${HOME}/.ssh/authorized_keys:/home/miac/.ssh/authorized_keys:ro \
+     -h $MIAC_PRIMARY_HOSTNAME \
+     --name miac-${tag} \
+     miac-${tag} "$@"
+
+#     --user miac:miac \
+#     -v ${HOME}/.ssh/id_rsa:/home/miac/.ssh/id_rsa:ro \
+
+#     -v ${HOME}/.ssh:/home/miac/.ssh:ro \
+
+#     -v ${HOME}/miac:/home/user-data \

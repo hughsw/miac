@@ -1,0 +1,69 @@
+FROM miac-install
+#FROM miac-base
+
+# Mail-in-a-Box
+COPY packages/mailinabox/mailinabox/ /home/miac/mailinabox/
+#RUN ls -laR /home/miac/mailinabox/ && false
+
+ENV NONINTERACTIVE=1
+ENV SKIP_NETWORK_CHECKS=1
+ENV DISABLE_FIREWALL=1
+
+ENV MIAC_HOSTNAME=
+ENV MIAC_ADMIN_EMAIL=
+ENV MIAC_ADMIN_PW=
+ENV MIAC_TIMEZONE=Etc/UTC
+
+RUN true \
+  && cd /home/miac/mailinabox \
+  && sed -i \
+       -e 's|\bhide_output service\b|echo MIAC skipping: hide_output service|' \
+       setup/functions.sh \
+  && sed -i \
+       -e 's|^hostname |echo MIAC skipping hostname |' \
+       -e 's|\bhide_output add-apt-repository\b|echo MIAC skipping add-apt-repository|' \
+       -e 's|\bpollinate  -q -r\b|echo MIAC skipping pollinate  -q -r|' \
+       -e 's|\brestart_service\b|echo MIAC skipping restart_service|' \
+       -e 's|\bsystemctl restart\b|echo MIAC skipping systemctl restart|' \
+       setup/system.sh \
+  && sed -i \
+       -e 's|\bservice postgrey stop\b|echo MIAC skipping service postgrey stop|' \
+       -e 's|\bservice postgrey restart\b|echo MIAC skipping service postgrey restart|' \
+       setup/mail-postfix.sh \
+  && sed -i \
+       -e 's|^hide_output systemctl daemon-reload$|echo MIAC skipping hide_output systemctl daemon-reload|' \
+       setup/management.sh  \
+  && sed -i \
+       -e 's|^hide_output systemctl daemon-reload$|echo MIAC skipping hide_output systemctl daemon-reload|' \
+       -e 's|\bsudo -H -u munin munin-cron$|mkdir -p /var/run/munin \&\& chown munin:munin /var/run/munin # MIAC \&\& sudo -H -u munin munin-cron|' \
+       setup/munin.sh \
+  && true
+
+#       -e 's|^rm -f /etc/resolv.conf$|echo > /etc/resolv.conf|' \
+
+#
+#    -e 's|\bsudo -H -u munin munin-cron$|mkdir -p /var/run/munin \&\& chown munin:munin /var/run/munin \&\& sudo -H -u munin munin-cron # MIAC|' \
+# sudo -H -u munin munin-cron
+# [FATAL] There is nothing to do here, since there are no nodes with any plugins.  Please refer to http://munin-monitoring.org/wiki/FAQ_no_graphs at /usr/share/munin/munin-html line 40.
+
+#tail setup/munin.sh
+
+COPY --chown=miac:miac setup/ /home/miac/mailinabox/setup/
+
+COPY --chown=miac:miac start-miac-0.sh /home/miac/mailinabox/setup/
+#RUN /home/miac/mailinabox/setup/env-conf.sh
+COPY --chown=miac:miac miac-0.sh /home/miac/
+RUN /home/miac/miac-0.sh
+
+COPY --chown=miac:miac start-miac-1.sh /home/miac/mailinabox/setup/
+COPY --chown=miac:miac miac-1.sh /home/miac/
+RUN /home/miac/miac-1.sh
+
+COPY --chown=miac:miac miac-2.sh miac-3.sh /home/miac/
+
+COPY --chown=miac:miac start-miac-2.sh /home/miac/mailinabox/setup/
+RUN /home/miac/miac-2.sh
+
+COPY --chown=miac:miac start-miac-3.sh /home/miac/mailinabox/setup/
+
+COPY --chown=miac:miac miac.sh /home/miac/

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -euo pipefail
+
+# MIAC TODO: figure out how to manage env at various levels...
+MIAC_SETUP_DIR=miac
+
+sudo -E -H bash -x $MIAC_SETUP_DIR/miac-setup-conf.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-conf.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+sudo -E -H bash -x $MIAC_SETUP_DIR/miac-setup-migrate.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-migrate.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+sudo -E -H bash -x $MIAC_SETUP_DIR/miac-setup-runtime.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-runtime.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+sudo -E -H bash -x $MIAC_SETUP_DIR/miac-setup-systemd.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-systemd.log_$(date '+%Y-%m-%d-%H%M-%S')

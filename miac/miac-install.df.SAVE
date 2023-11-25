@@ -1,0 +1,57 @@
+FROM miac-base
+
+# Ubuntu repositories for Mail-in-a-box
+COPY --chown=miac:miac repos.sh /home/miac/build/
+RUN /home/miac/build/repos.sh
+
+# Ubuntu packages for Mail-in-a-box
+COPY --chown=miac:miac install.sh /home/miac/build/
+RUN /home/miac/build/install.sh
+
+# ./update-miac
+
+# Mail-in-a-Box and third party packages
+COPY  --chown=miac:miac packages/mailinabox/mailinabox/ /home/miac/mailinabox/
+
+# Roundcube Mail
+#COPY  --chown=miac:miac packages/roundcube/roundcubemail/ /home/miac/packages/roundcube/roundcubemail/
+COPY  packages/roundcube/roundcubemail/ /usr/local/lib/roundcubemail/
+
+#COPY  --chown=miac:miac packages/roundcube/persistent_login/ /home/miac/packages/roundcube/persistent_login/
+COPY  packages/roundcube/persistent_login/ /usr/local/lib/roundcubemail/plugins/persistent_login/
+
+#COPY  --chown=miac:miac packages/roundcube/html5_notifier/ /home/miac/packages/roundcube/html5_notifier/
+COPY packages/roundcube/html5_notifier/ /usr/local/lib/roundcubemail/plugins/html5_notifier/
+
+#COPY  --chown=miac:miac packages/roundcube/carddav/ /home/miac/packages/roundcube/carddav/
+COPY packages/roundcube/carddav/ /usr/local/lib/roundcubemail/plugins/carddav/
+
+
+# Nextcloud
+#COPY  --chown=miac:miac packages/nextcloud/nextcloud/ /home/miac/packages/nextcloud/nextcloud/
+COPY packages/nextcloud/nextcloud/ /usr/local/lib/owncloud/
+
+#COPY  --chown=miac:miac packages/nextcloud/contacts/ /home/miac/packages/nextcloud/contacts/
+COPY  packages/nextcloud/contacts/ /usr/local/lib/owncloud/apps/contacts/
+
+#COPY  --chown=miac:miac packages/nextcloud/calendar/ /home/miac/packages/nextcloud/calendar/
+COPY  packages/nextcloud/calendar/ /usr/local/lib/owncloud/apps/calendar/
+
+#COPY  --chown=miac:miac packages/nextcloud/user_external/ /home/miac/packages/nextcloud/user_external/
+COPY packages/nextcloud/user_external/ /usr/local/lib/owncloud/apps/user_external/
+
+
+# Z-Push
+#COPY  --chown=miac:miac packages/z-push/z-push/ /home/miac/packages/z-push/
+COPY packages/z-push/z-push/ /usr/local/lib/z-push/
+
+
+# JQuery
+#COPY  --chown=miac:miac packages/jquery/ /home/miac/packages/jquery
+COPY packages/jquery/jquery.min.js /usr/local/lib/mailinabox/vendor/assets/jquery.min.js
+
+
+# Bootstrap
+#COPY  --chown=miac:miac packages/bootstrap/bootstrap/ /home/miac/packages/bootstrap/
+COPY packages/bootstrap/bootstrap/ /usr/local/lib/mailinabox/vendor/assets/bootstrap/
+

@@ -1,0 +1,60 @@
+FROM miac-base
+
+# Build the generic part of a Mail-in-a-Box system
+
+# MIAC-specific tooling
+RUN pip install pythondialog validators
+
+WORKDIR /home/miac/mailinabox/
+
+# Mail-in-a-Box
+COPY --chown=miac:miac miab/ /home/miac/mailinabox/
+
+#RUN git config --global --add safe.directory /home/miac/mailinabox && git checkout miac
+
+ENV MIAC_GENERIC_STORAGE_ROOT=/home/miac/generic-user-data
+
+ENV SKIP_NETWORK_CHECKS=1
+ENV DISABLE_FIREWALL=1
+ENV NONINTERACTIVE=1
+
+RUN mkdir -p $MIAC_GENERIC_STORAGE_ROOT && touch $MIAC_GENERIC_STORAGE_ROOT/miac-env.sh
+
+# During install STORAGE_ROOT is only used by nextcloud install, which should be factored
+# to separate initial install from upgrade/migration, and then STORAGE_ROOT would not be
+# used during install
+ENV STORAGE_ROOT=/home/user-data
+# We use the  symlink during build (preferably just for generic work), so that config stuff is
+# stored to MIAC_GENERIC_STORAGE_ROOT; then, after build, the link is removed and the
+# directory is created, and a host volume is  bound to it by podman run commands
+RUN ln -s $MIAC_GENERIC_STORAGE_ROOT $STORAGE_ROOT
+
+# TODO: figure out how to use systemd to get these env vars into sshd/login environment
+ENV STORAGE_ROOT=/home/user-data
+ENV STORAGE_USER=user-data
+
+# undo the symlink and create a directory instead
+# more double-take scripting
+RUN rm $STORAGE_ROOT && mkdir $STORAGE_ROOT ; ls -la /home
+
+
+COPY miac-conf.py setup/
+
+# keep podman build happy...
+ARG MIAC_SSH_KEY
+
+
+#RUN cd /home/miac/mailinabox/ && sudo -E bash -x setup/start.sh 2>&1 | tee --output-error=exit /miac/logs/start.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+
+#RUN cd /home/miac/mailinabox/ && sudo bash -x setup/miac-setup-conf.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-conf.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+#RUN cd /home/miac/mailinabox/ && sudo bash -x setup/miac-setup-migrate.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-migrate.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+#RUN cd /home/miac/mailinabox/ && sudo bash -x setup/miac-setup-runtime.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-runtime.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+#RUN cd /home/miac/mailinabox/ && sudo bash -x setup/miac-setup-systemd.sh 2>&1 | tee --output-error=exit /miac/logs/miac-setup-systemd.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+# cd /home/miac/mailinabox/ && sudo bash -c '(bash -x <(cat /etc/mailinabox.conf setup/miac-setup-migrate.sh))' 2>&1 | tee --output-error=exit /miac/logs/miac-setup-migrate.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+# cd /home/miac/mailinabox/ && sudo bash -c '(bash -x <(cat /etc/mailinabox.conf setup/miac-setup-systemd.sh))' 2>&1 | tee --output-error=exit /miac/logs/miac-setup-systemd.log_$(date '+%Y-%m-%d-%H%M-%S')

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# remove unnamed images -- not idempotent, but seems to get to a fixed point on multiple runs
+podman image list -a | mawk '$1=="<none>" {print $3}' | xargs podman image rm --force

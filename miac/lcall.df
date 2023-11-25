@@ -1,0 +1,67 @@
+FROM docker.io/library/ubuntu:22.04
+
+RUN true \
+  && set -x \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive \
+     apt-get \
+       -o Dpkg::Options::=--force-confold \
+       -o Dpkg::Options::=--force-confdef \
+       --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+       upgrade \
+       < /dev/null \
+  && true
+
+#RUN echo y | unminimize
+
+RUN true \
+  && DEBIAN_FRONTEND=noninteractive \
+    apt-get \
+      -o Dpkg::Options::=--force-confold \
+      -o Dpkg::Options::=--force-confdef \
+      --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+      install \
+        curl \
+	emacs-nox \
+	git \
+	iproute2 \
+	iptables \
+	locales \
+	screen \
+	ssh \
+	sudo \
+	systemd \
+	haveged \
+	networkd-dispatcher \
+	unattended-upgrades \
+	systemd-timesyncd \  
+	< /dev/null \
+  && systemctl enable systemd-timesyncd \
+  && systemctl disable exim4.service exim4.timer \
+  && locale-gen en_US.UTF-8 \
+  && true
+
+# Use systemd as command
+CMD ["/usr/bin/systemd"]
+
+# auto root login on console
+RUN sed -i 's/ --noclear / --noclear --autologin root /' /lib/systemd/system/console-getty.service
+RUN sed -i '1s|^|auth sufficient pam_listfile\.so item=tty sense=allow file=/etc/securetty onerr=fail apply=root\n|' /etc/pam.d/login
+#RUN head /etc/pam.d/login
+#RUN echo ttyS0 > /etc/securetty
+RUN echo console >> /etc/securetty
+
+COPY lcall.sh /root
+
+RUN bash -c '/root/lcall.sh'
+
+#RUN true \
+#  && set -x \
+#  && apt-get install -y locales \
+#  && locale \
+#  && locale -a \
+#  && locale-gen en_US.UTF-8 \
+#  && bash -c 'export LC_ALL=en_US.UTF-8' \
+#  && false \
+#  && true
+

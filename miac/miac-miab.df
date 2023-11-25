@@ -1,0 +1,43 @@
+FROM miac-install
+
+#ARG MIAC_SSH_KEY
+
+WORKDIR /home/miac
+
+#RUN curl -sS https://mailinabox.email/setup.sh | sed -e 's|^setup/start\.sh\b|echo MIAC skipping: setup/start.sh|' > setup.sh
+
+RUN curl -sS https://raw.githubusercontent.com/hughsw/miac/miab/setup/bootstrap.sh > setup.sh
+ARG TAG
+RUN cat setup.sh | sudo -E -u miac -g miac -H sudo -E bash -ex
+
+RUN chown -R miac:miac .
+
+WORKDIR /home/miac/mailinabox
+
+COPY dev- mailinabox /usr/local/bin/
+
+
+# auto miac login on podman console
+RUN sed -i 's/ --noclear / --noclear --autologin miac /' /lib/systemd/system/console-getty.service
+RUN sed -i '1s|^|auth sufficient pam_listfile\.so item=tty sense=allow file=/etc/securetty onerr=fail apply=miac\n|' /etc/pam.d/login
+RUN echo console >> /etc/securetty
+
+
+#RUN head /etc/pam.d/login
+#RUN echo ttyS0 > /etc/securetty
+
+#RUN true \
+#  && sed -i \
+#       -e 's|^hostname |echo MIAC skipping: hostname |' \
+#       -e 's|^rm -f /etc/resolv.conf\b|echo > /etc/resolv.conf  # MIAC was: rm -f /etc/resolv.conf|' \
+#       setup/system.sh \
+#  && git remote add miac git@github.com:hughsw/miac.git \
+#  && chown -R miac:miac /home/miac \
+#  && true
+
+# sudo mailinabox
+# sudo -E mailinabox
+
+# sudo -E bash -x /usr/local/bin/mailinabox 2>&1 | tee --output-error=exit /miac/logs/mailinabox.log_$(date '+%Y-%m-%d-%H%M-%S')
+
+# cd /home/miac/mailinabox && sudo -E bash -x setup/start.sh 2>&1 | tee --output-error=exit /miac/logs/start.log_$(date '+%Y-%m-%d-%H%M-%S')

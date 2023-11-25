@@ -1,0 +1,3 @@
+#!/bin/sh
+
+printf "\nWelcome to MIAC, Mail-in-a-Container, based on the excellent Mail-in-a-Box"

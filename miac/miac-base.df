@@ -1,0 +1,78 @@
+FROM docker.io/library/ubuntu:22.04
+
+RUN echo \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive \
+     apt-get \
+       -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
+       --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+       upgrade \
+       < /dev/null \
+  && DEBIAN_FRONTEND=noninteractive \
+    apt-get \
+      -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
+      --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+      install \
+        apt-utils \
+        curl \
+        dnsutils \
+        emacs-nox \
+        git \
+        haveged \
+        iproute2 \
+        locales \
+	python3 \
+	python3-pip \
+        screen \
+        ssh \
+        sudo \
+        systemd \
+        unattended-upgrades \
+        < /dev/null \
+  && true
+
+RUN true \
+  && systemctl enable systemd-networkd \
+  && systemctl disable systemd-timesyncd \
+  && locale-gen en_US.UTF-8 \
+  && rm -f /etc/update-motd.d/60-unminimize \
+  && true
+
+#        networkd-dispatcher \
+
+#  && systemctl disable exim4.service exim4.timer \
+
+# Use systemd as command
+CMD ["/usr/bin/systemd"]
+
+# Base Ubuntu system system is ready
+
+# MIAC login motd
+RUN chmod -x /etc/update-motd.d/* && mv /etc/legal /etc/legal.ORIG
+COPY 40-miac 50-miac /etc/update-motd.d/
+
+# Add user: miac, public key login only
+# Recommended that podman run mount your authorized_keys read-only to /home/miac/.ssh/authorized_keys
+
+COPY 010_miac-nopasswd /etc/sudoers.d/
+COPY bashrc /home/miac/.bash_login
+RUN true \
+  && useradd --shell /bin/bash --user-group miac \
+  && mkdir -p --mode go-rwx /home/miac/.ssh \
+  && chown -R miac:miac /home/miac \
+  && sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config \
+  && true
+
+ARG TAG
+
+# TODO: abstract the key to an env var...
+#COPY authorized_keys /home/miac/.ssh/
+
+#  && echo "${MIAC_SSH_KEY}" > /home/miac/.ssh/authorized_keys \
+#  && chmod go-rwx /home/miac/.ssh/authorized_keys \
+
+#  && chmod go-rwx /home/miac/.ssh \
+#  --create-home
+
+
+# Fairly unopinionated Ubuntu system at this point, systemd and thus logins, and with user miac who has sudo

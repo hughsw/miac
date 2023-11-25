@@ -1,0 +1,25 @@
+FROM miac-base
+
+# Ubuntu repositories for Mail-in-a-box
+COPY --chown=miac:miac repos.sh /home/miac/build/
+RUN /home/miac/build/repos.sh
+
+# Ubuntu packages for Mail-in-a-box
+COPY --chown=miac:miac install.sh /home/miac/build/
+RUN /home/miac/build/install.sh
+
+RUN true \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get \
+      -o Dpkg::Options::=--force-confold \
+      -o Dpkg::Options::=--force-confdef \
+      --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+      upgrade \
+    && DEBIAN_FRONTEND=noninteractive apt-get \
+      -o Dpkg::Options::=--force-confold \
+      -o Dpkg::Options::=--force-confdef \
+      --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+      dist-upgrade \
+    && true
+
+ARG TAG

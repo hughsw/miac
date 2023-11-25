@@ -1,0 +1,243 @@
+Overview:
+- base system image
+- installs from apt-get, curl, git, pip, and do config before install, e.g. nsd
+- generic system image, add configs for installs
+- container
+  - config
+    - what is mutable
+  - initialization
+  - ongoing
+    - ubuntu upgrades
+    - resecure: regenerate keys, certs, etc
+- ALL persistent container configuration and state should be in STORAGE_ROOT
+
+VARS:
+- NONINTERACTIVE
+- FIRST_TIME_SETUP
+- DEFAULT_*
+- PRIMARY_HOSTNAME DEFAULT_PRIMARY_HOSTNAME
+- PUBLIC_IP DEFAULT_PUBLIC_IP
+- PUBLIC_IPV6 DEFAULT_PUBLIC_IPV6
+- GUESSED_IP
+- PRIVATE_IP
+- PRIVATE_IPV6
+- STORAGE_USER DEFAULT_STORAGE_USER
+- STORAGE_ROOT DEFAULT_STORAGE_ROOT
+- SKIP_NETWORK_CHECKS
+- DISABLE_FIREWALL
+
+Note:
+- various hardwired email addresses
+- obsolete chown syntax
+- what is #NODOC
+
+start.sh
+
++ source setup/functions.sh
+++ PHP_VER=8.0
+
++ source setup/preflight.sh
+memory
+exec in /tmp
+architechture
+
+export LANGUAGE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
+export LC_TYPE=en_US.UTF-8
+
+export NCURSES_NO_UTF8_ACS=1
+
+setup/migrate.py --migrate || exit 1
+
+cat /etc/mailinabox.conf | sed s/^/DEFAULT_/ > /tmp/mailinabox.prev.conf
+
++ source setup/questions.sh
+value "auto" and Vagrant usage
+validate env vars: hostname(s), email, password, timezone, ...
+
+network-checks.sh
+- blacklists
+- outbound connections
+
+STORAGE_ROOT and STORAGE_USER and migrations
+mailinabox.version
+
+save the config to /etc/mailinabox.conf
+
+
++ source setup/system.sh
+
+++ hostname shed.cochleaudio.com
+
+user permissions, moot?
+RAM and swap ?
+
+journalctl or log retention...
+
+apt-get grooming, moot?
+
+updates config, , moot?
+	tools/editconf.py /etc/update-manager/release-upgrades Prompt=never
+	rm -f /var/lib/ubuntu-release-upgrader/release-upgrade-available
+
+set timezone
+
+seed /dev/urandom
+create /root/.ssh/id_rsa_miab
+
+# Allow apt to install system updates automatically every day.
+cat > /etc/apt/apt.conf.d/02periodic <<EOF;
+APT::Periodic::MaxAge "7";
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+APT::Periodic::Verbose "0";
+EOF
+
+ufw allow ssh,
+change sshd config, set to 2222 only
+
+setup local recursive DNS server
+bind9
+config bind9
+update resolv.conf
+
+
+restart_service bind9
+systemctl restart systemd-resolved
+
+configure fail2ban
+restart_service fail2ban
+
+
++ source setup/ssl.sh
+# Create an RSA private key, a self-signed SSL certificate, and some
+# Diffie-Hellman cipher bits, if they have not yet been created.
+ || [ ! -f $STORAGE_ROOT/ssl/ssl_private_key.pem ] \
+ || [ ! -f $STORAGE_ROOT/ssl/ssl_certificate.pem ] \
+ || [ ! -f $STORAGE_ROOT/ssl/dh2048.pem ]; then
+
+
++ source setup/dns.sh
+nsd configuration, set prior to install of nsd, but after we know private IPs (which can be early, via podman --ip)
+configure nsd log rotation
+
+create dnssec signing keys
+mkdir -p "$STORAGE_ROOT/dns/dnssec";
+
+config cron.daily to re-sign zones
+ufw domain
+
+
++ source setup/mail-postfix.sh
+note: overlap with dovecot
+
+tweak postfix config
+	smtp_bind_address=$PRIVATE_IP \
+	smtp_bind_address6=$PRIVATE_IPV6 \
+sed -i "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" /etc/postfix/outgoing_mail_header_filters
+sed -i "s/PUBLIC_IP/$PUBLIC_IP/" /etc/postfix/outgoing_mail_header_filters
+
+install conf files
+
+certificates in STORAGE_ROOT
+note: make it easy to configure less strict protocols to support older clients (Macs that use old TLS)
+
+DANE
+
+postgrey
+postgrey whitelist
+TODO: cron/systemd.timer to update the whitelists file
+
+ufw_allow smtp
+ufw_allow smtps
+ufw_allow submission
+
+# Restart services
+
+restart_service postfix
+restart_service postgrey
+
+
++ source setup/mail-dovecot.sh
+
+tweak dovecot configs
+install conf files
+certificates in STORAGE_ROOT
+cipher settings
+note: make it easy to configure less strict protocols to support older clients (Macs that use old TLS)
+
+sieve compilation: sievec
+
+# Allow the IMAP/POP ports in the firewall.
+ufw_allow imaps
+ufw_allow pop3s
+
+# Allow the Sieve port in the firewall.
+ufw_allow sieve
+
+# Restart services.
+restart_service dovecot
+
+
++ source setup/mail-users.sh
+
+create users.sqlite
+tweak dovecot configs
+setup sql queries for dovecot
+allow postfix to access
+enable postfix to access
+create utility sql statements in postfix files
+
+restart_service postfix
+restart_service dovecot
+
+
++ source setup/dkim.sh
+create/tweak configuration
+create dkim key
+
+# We need to explicitly enable the opendmarc service, or it will not start
+hide_output systemctl enable opendmarc
+
+# Restart services.
+restart_service opendkim
+restart_service opendmarc
+restart_service postfix
+
+
++ source setup/spamassassin.sh
+tweak configs for spamassassin
+pyzor state is in /etc/spamassassin/pyzor
+bayesean learning on STORAGE_ROOT
+# Initial training?
+
+restart_service spampd
+restart_service dovecot
+
+
++ source setup/web.sh
+no apache or other httpd
+
+build nginx config
+php config
+create /var/lib/mailinabox/mobileconfig.xml
+create /var/lib/mailinabox/mozilla-autoconfig.xml
+create /var/lib/mailinabox/mta-sts.txt
+ensure $STORAGE_ROOT/www/default/index.html
+
+restart_service nginx
+restart_service php$PHP_VER-fpm
+
+# Open ports.
+ufw_allow http
+ufw_allow https
+
+
++ source setup/webmail.sh
+roundcube installed from sources due to Ubuntu config  hassles
+wget and git
+roundcube
+persistent_login
+html5_notifier
+carddav

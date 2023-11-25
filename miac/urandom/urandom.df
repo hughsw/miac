@@ -1,0 +1,23 @@
+FROM ubuntu:22.04
+
+RUN true \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive \
+     apt-get \
+       -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
+       --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+       upgrade \
+       < /dev/null \
+  && true
+
+RUN true \
+  && DEBIAN_FRONTEND=noninteractive \
+    apt-get \
+      -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
+      --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+      install \
+        openssl \
+        < /dev/null \
+  && true
+
+RUN /bin/bash -c 'time openssl dhparam -out /tmp/dh2048.pem 2048'

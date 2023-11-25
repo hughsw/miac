@@ -1,0 +1,6 @@
+FROM miac-generic
+
+# Build the generic part of a Mail-in-a-Box system
+
+# 
+COPY --chown=miac:miac miab/setup/miacconf.sh /home/miac/mailinabox/setup/

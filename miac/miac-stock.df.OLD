@@ -1,0 +1,27 @@
+FROM miac-base
+
+# Build the generic part of a Mail-in-a-Box system
+
+# Mail-in-a-Box
+COPY --chown=miac:miac miab/ /home/miac/mailinabox/
+
+# Configuraton for setup/start.sh
+# MUST coordinate with setup/miac.sh
+# TODO: figure out how to use systemd to get these env vars into sshd/login environment
+ENV STORAGE_ROOT=/home/miac/generic-user-data
+ENV SKIP_NETWORK_CHECKS=1
+ENV DISABLE_FIREWALL=1
+ENV NONINTERACTIVE=1
+
+#ENV PRIMARY_HOSTNAME=shed.cochleaudio.com
+#ENV EMAIL_ADDR=me@cochleaudio.com
+#ENV EMAIL_PW=12345678
+
+# Most Ubuntu packages have been installed, bind9 and nsd are exceptions
+# Avoid steps because no systemd is running
+# Avoid steps because no configuration provided
+ENV MIAC_INSTALL=
+ENV MIAC_SYSTEMD=
+ENV MIAC_CONF=
+
+#RUN cd /home/miac/mailinabox/ && sudo bash -x setup/start.sh 2>&1 | tee --output-error=exit /miac/logs/start.log_$(date '+%Y-%m-%d-%H%M-%S')

@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -euo pipefail
+trap 'rc=$?;set +ex;if [[ $rc -ne 0 ]];then trap - ERR EXIT;echo 1>&2;echo "*** fail *** : code $rc : $DIR/$SCRIPT $ARGS" 1>&2;echo 1>&2;exit $rc;fi' ERR EXIT
+ARGS="$*"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT="$(basename "${BASH_SOURCE[0]}")"
+
+# see /etc/sysctl.d/local.conf for setting of net.ipv4.ip_unprivileged_port_start
+
+set -x                                                                                                                                                                                                            
+exec podman run \
+     --replace \
+     --cap-add SYS_ADMIN --cap-add NET_ADMIN --cap-add CAP_NET_RAW \
+     -it \
+     -v ${DIR}:/base \
+     -p 2223:22 \
+     -h base.cochleaudio.com \
+     --name base \
+     base
+
+
+#      --dns none \
+
+# ufw limit 22/tcp
+# ufw allow 53
+# ufw allow 25/tcp
+# ufw allow 465/tcp
+# ufw allow 587/tcp
+# ufw allow 993/tcp
+# ufw allow 995/tcp
+# ufw allow 4190/tcp
+# ufw allow 80/tcp
+# ufw allow 443/tcp

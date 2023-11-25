@@ -1,0 +1,11 @@
+FROM miac-generic
+
+# Build the statically configurable configuration
+
+# eventually not needed
+COPY --chown=miac:miac miab/setup/miacconf.sh /home/miac/mailinabox/setup/
+
+RUN cd /home/miac/mailinabox && bash -x setup/miacconf.sh
+
+# 
+#

@@ -1,0 +1,10 @@
+WORKDIR /home/miac
+
+#RUN runuser -u miac -- sudo bash get-miac-package.sh
+RUN setpriv --reuid=miac --regid=miac  --keep-groups echo ~/
+#RUN setpriv --reuid=miac --regid=miac --reset-env --init-groups echo ~/
+RUN setpriv --reuid=miac --regid=miac --reset-env --init-groups whoami
+RUN setpriv --reuid=miac --regid=miac --reset-env --init-groups echo $HOME
+
+#RUN cd /home/miac && setpriv --reuid=miac --regid=miac --reset-env --init-groups sudo bash get-miac-package.sh
+RUN setpriv --reuid=miac --regid=miac --reset-env --keep-groups  sudo bash -c 'HOME=/home/miac source get-miac-package.sh'

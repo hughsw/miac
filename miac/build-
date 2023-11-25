@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -euo pipefail
+trap 'rc=$?;set +ex;if [[ $rc -ne 0 ]];then trap - ERR EXIT;echo 1>&2;echo "*** fail *** : code $rc : $DIR/$SCRIPT $ARGS" 1>&2;echo 1>&2;exit $rc;fi' ERR EXIT
+ARGS="$*"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT="$(basename "${BASH_SOURCE[0]}")"
+
+tag=$1
+shift
+
+#MIAC_SSH_KEY="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDY6wXWX2cBFMCRqW8wONBZFgDiqgH0hjgJ7U59HYu58KVrMr5l8Z9YyTP+NJiv1tFnwN9riVa58iFuSRyUHFfZrjGfBy/C5Uzpxv8QgG2FucTqT13enlFou2hIxTmtcs3bwTomcxrgajz2iyGwgoDpj5kl8tAfAIA99Uzqy37ues7dPaBS/wb5qEtYg9FYlhq3JY7QbjIquBmmg/7UHUqOVefFqhgZFZ1UWt63iqzkCZfXRk5rAKJe1DnHOznXscV10GRDZloZA66Zo9W5pMcuTUlHqG0Uu1nI2GTyM47E4fCdsSXVVggnunVx4vqf2qMXymAYTxnjwGEa8Nb9F293 hugh@Hughs-MacBook-Pro.local"
+
+MIAC_MIAB_TAG=v60.1miac1
+
+set -x
+exec podman build --build-arg=TAG=$MIAC_MIAB_TAG -f miac-${tag}.df -t miac-${tag} "$@"
+
+#exec podman build --build-arg=MIAC_SSH_KEY="$MIAC_SSH_KEY" -f miac-${tag}.df -t miac-${tag} "$@"

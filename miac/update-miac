@@ -1,0 +1,125 @@
+#!/bin/bash
+
+set -euo pipefail
+trap 'rc=$?;set +ex;if [[ $rc -ne 0 ]];then trap - ERR EXIT;echo 1>&2;echo "*** fail *** : code $rc : $DIR/$SCRIPT $ARGS" 1>&2;echo 1>&2;exit $rc;fi' ERR EXIT
+ARGS="$*"
+DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SCRIPT="$(basename "${BASH_SOURCE[0]}")"
+
+function ensureCleanDir {
+    dir=$1
+    cd $packDir
+    touch $dir
+    rm -r $dir
+    mkdir $dir
+    cd $dir
+}
+
+set -x                                                                                                                                                                                                            
+
+MAIL_IN_A_BOX_TAG=v60.1
+#MAIL_IN_A_BOX_TAG=v60
+JQUERY_VER=2.1.4
+BOOTSTRAP_VER=3.3.7
+ROUNDCUBE_VER=1.6.0
+NEXTCLOUD_VER=23.0.10
+CALENDAR_VER=3.5.1
+CONTACTS_VER=4.2.2
+USER_EXTERNA_VER=3.0.0
+CARDDAV_VER=4.4.3
+Z_PUSH_VER=2.6.2
+
+
+packDir=${DIR}/packages
+mkdir -p $packDir
+ensureCleanDir $packDir
+
+# Mail-in-a-Box
+#curl -sSL https://mailinabox.email/setup.sh | sed -e 's|^setup/start.sh|# MIAC setup/start.sh|' > ${DIR}/setup.sh
+ensureCleanDir mailinabox
+git clone -b $MAIL_IN_A_BOX_TAG --depth 1 https://github.com/mail-in-a-box/mailinabox mailinabox < /dev/null
+
+ensureCleanDir jquery
+curl -sSL https://code.jquery.com/jquery-${JQUERY_VER}.min.js --output jquery.min.js 
+
+ensureCleanDir bootstrap
+curl -sSL https://github.com/twbs/bootstrap/releases/download/v${BOOTSTRAP_VER}/bootstrap-${BOOTSTRAP_VER}-dist.zip --output bootstrap.zip
+unzip bootstrap.zip
+rm bootstrap.zip
+ln -s bootstrap-${BOOTSTRAP_VER}-dist bootstrap
+
+ensureCleanDir roundcube
+
+curl -sSL https://github.com/roundcube/roundcubemail/releases/download/${ROUNDCUBE_VER}/roundcubemail-${ROUNDCUBE_VER}-complete.tar.gz --output roundcubemail.tgz 
+tar --no-same-owner -xzf roundcubemail.tgz
+rm roundcubemail.tgz
+ln -s roundcubemail-${ROUNDCUBE_VER} roundcubemail
+
+git clone -q https://github.com/mfreiholz/Roundcube-Persistent-Login-Plugin.git persistent_login
+(cd persistent_login && git checkout -q bde7b6840c7d91de627ea14e81cf4133cbb3c07a)
+#++ mv /tmp/git-clone-949/ /usr/local/lib/roundcubemail/plugins/persistent_login
+
+git clone -q https://github.com/kitist/html5_notifier.git html5_notifier
+(cd html5_notifier && git checkout -q 68d9ca194212e15b3c7225eb6085dbcf02fd13d7)
+#++ mv /tmp/git-clone-949/ /usr/local/lib/roundcubemail/plugins/html5_notifier
+
+curl -sSL https://github.com/mstilkerich/rcmcarddav/releases/download/v${CARDDAV_VER}/carddav-v${CARDDAV_VER}.tar.gz --output carddav.tgz 
+tar xzf carddav.tgz
+rm carddav.tgz
+
+
+ensureCleanDir nextcloud
+
+curl -sSL https://download.nextcloud.com/server/releases/nextcloud-${NEXTCLOUD_VER}.zip --output nextcloud.zip 
+unzip nextcloud.zip
+rm nextcloud.zip
+
+curl -sSL https://github.com/nextcloud-releases/calendar/archive/refs/tags/v${CALENDAR_VER}.tar.gz --output calendar.tgz 
+tar xzf calendar.tgz
+rm calendar.tgz
+ln -s calendar-${CALENDAR_VER} calendar
+
+curl -sSL https://github.com/nextcloud-releases/contacts/archive/refs/tags/v${CONTACTS_VER}.tar.gz --output contacts.tgz 
+tar xzf contacts.tgz
+rm contacts.tgz
+ln -s contacts-${CONTACTS_VER} contacts
+
+curl -sSL https://github.com/nextcloud-releases/user_external/releases/download/v${USER_EXTERNA_VER}/user_external-v${USER_EXTERNA_VER}.tar.gz --output user_external.tgz 
+tar xzf user_external.tgz
+rm user_external.tgz
+
+ensureCleanDir z-push
+curl -sSL https://github.com/Z-Hub/Z-Push/archive/refs/tags/${Z_PUSH_VER}.zip --output z-push.zip 
+unzip z-push.zip
+rm z-push.zip
+ln -s Z-Push-${Z_PUSH_VER} z-push
+
+
+# ++ wget -O /tmp/roundcube.tgz https://github.com/roundcube/roundcubemail/releases/download/1.6.0/roundcubemail-1.6.0-complete.tar.gz
+# ++ wget -O /tmp/carddav.tar.gz https://github.com/mstilkerich/rcmcarddav/releases/download/v4.4.3/carddav-v4.4.3.tar.gz
+# ++ wget -O /tmp/nextcloud.zip https://download.nextcloud.com/server/releases/nextcloud-23.0.8.zip
+# 
+# ++ wget -O /tmp/contacts.tgz https://github.com/nextcloud-releases/contacts/archive/refs/tags/v4.2.0.tar.gz
+# ++ wget -O /tmp/calendar.tgz https://github.com/nextcloud-releases/calendar/archive/refs/tags/v3.5.0.tar.gz
+# ++ wget -O /tmp/user_external.tgz https://github.com/nextcloud-releases/user_external/releases/download/v3.0.0/user_external-v3.0.0.tar.gz
+# 
+# ++ wget -O /tmp/z-push.zip https://github.com/Z-Hub/Z-Push/archive/refs/tags/2.6.2.zip
+# ++ wget -O /usr/local/lib/mailinabox/vendor/assets/jquery.min.js https://code.jquery.com/jquery-2.1.4.min.js
+# ++ wget -O /tmp/bootstrap.zip https://github.com/twbs/bootstrap/releases/download/v3.3.7/bootstrap-3.3.7-dist.zip
+
+#management.sh:67:wget_verify $jquery_url/jquery-$jquery_version.min.js 43dc554608df885a59ddeece1598c6ace434d747 $assets_dir/jquery.min.js
+#management.sh:74:wget_verify $bootstrap_url e6b1000b94e835ffd37f4c6dcbdad43f4b48a02a /tmp/bootstrap.zip
+#nextcloud.sh:73:        wget_verify https://download.nextcloud.com/server/releases/nextcloud-$version.zip $hash /tmp/nextcloud.zip
+
+#nextcloud.sh:87:        wget_verify https://github.com/nextcloud-releases/contacts/archive/refs/tags/v$version_contacts.tar.gz $hash_contacts /tmp/contacts.tgz
+#nextcloud.sh:91:        wget_verify https://github.com/nextcloud-releases/calendar/archive/refs/tags/v$version_calendar.tar.gz $hash_calendar /tmp/calendar.tgz
+#nextcloud.sh:98:                wget_verify https://github.com/nextcloud-releases/user_external/releases/download/v$version_user_external/user_external-v$version_user_external.tar.gz $hash_user_external /tmp/user_external.tgz
+
+#https://github.com/roundcube/roundcubemail/releases/download/$VERSION/roundcubemail-$VERSION-complete.tar.gz \
+    #    $HASH \
+    #    /tmp/roundcube.tgz
+#https://github.com/mstilkerich/rcmcarddav/releases/download/v${CARDDAV_VERSION}/carddav-v${CARDDAV_VERSION}.tar.gz \
+    #     $CARDDAV_HASH \
+    #     /tmp/carddav.tar.gz
+#zpush.sh:36:    wget_verify "https://github.com/Z-Hub/Z-Push/archive/refs/tags/$VERSION.zip" $TARGETHASH /tmp/z-push.zip
+

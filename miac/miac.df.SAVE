@@ -1,0 +1,99 @@
+FROM docker.io/library/ubuntu:22.04
+
+RUN true \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive \
+     apt-get \
+       -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
+       --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+       upgrade \
+       < /dev/null \
+  && true
+
+RUN true \
+  && DEBIAN_FRONTEND=noninteractive \
+    apt-get \
+      -o Dpkg::Options::=--force-confold -o Dpkg::Options::=--force-confdef \
+      --assume-yes --allow-downgrades --allow-remove-essential --allow-change-held-packages \
+      install \
+        curl \
+        emacs-nox \
+        git \
+        haveged \
+        iproute2 \
+        locales \
+        networkd-dispatcher \
+        screen \
+        ssh \
+        sudo \
+        systemd \
+        systemd-timesyncd \  
+        unattended-upgrades \
+        < /dev/null \
+  && systemctl enable systemd-timesyncd \
+  && locale-gen en_US.UTF-8 \
+  && rm -f /etc/update-motd.d/60-unminimize \
+  && true
+
+#  && systemctl disable exim4.service exim4.timer \
+
+# Use systemd as command
+CMD ["/usr/bin/systemd"]
+
+# Base Ubuntu system system is ready
+
+# Add user: miac
+RUN useradd -m --shell /bin/bash -U miac && mkdir -m go-rwx /home/miac/.ssh
+COPY authorized_keys /home/miac/.ssh/
+RUN chown -R miac:miac /home/miac
+
+COPY 010_miac-nopasswd /etc/sudoers.d/
+
+
+# Fiarly unopinionated Ubuntu system at this point, with user miac who has sudo
+
+
+# Ubuntu repositories for Mail-in-a-box
+COPY --chown=miac:miac repos.sh /home/miac/build/
+RUN /home/miac/build/repos.sh
+
+# Ubuntu packages for Mail-in-a-box
+COPY --chown=miac:miac install.sh /home/miac/build/
+RUN /home/miac/build/install.sh
+
+# ./update-miac
+# Mail-in-a-Box and third party packages
+COPY packages/mailinabox/mailinabox/ /home/miac/mailinabox/
+COPY packages/bootstrap/bootstrap/ /home/miac/packages/bootstrap/
+COPY packages/jquery/ /home/miac/packages/jquery/
+COPY packages/nextcloud/nextcloud/ /home/miac/packages/nextcloud/nextcloud/
+COPY packages/nextcloud/calendar/ /home/miac/packages/nextcloud/calendar/
+COPY packages/nextcloud/contacts/ /home/miac/packages/nextcloud/contacts/
+COPY packages/nextcloud/user_external/ /home/miac/packages/nextcloud/user_external/
+COPY packages/roundcube/roundcubemail/ /home/miac/packages/roundcube/roundcubemail/
+COPY packages/roundcube/persistent_login/ /home/miac/packages/roundcube/persistent_login/
+COPY packages/roundcube/html5_notifier/ /home/miac/packages/roundcube/html5_notifier/
+COPY packages/roundcube/carddav/ /home/miac/packages/roundcube/carddav/
+COPY packages/z-push/z-push/ /home/miac/packages/z-push/
+#COPY packages/ /home/miac/packages/
+#RUN mv /home/miac/packages/mailinabox/mailinabox /home/miac/
+
+# Minor tweaks to Mail-in-a-box build
+COPY --chown=miac:miac seds.sh /home/miac/build/
+RUN /home/miac/build/seds.sh
+#RUN bash -x -c 'source /home/miac/build/seds.sh'
+
+COPY miac.sh /home/miac/
+
+## Get Mail-in-a-box git repo
+## ./update-miac
+#COPY --chown=miac:miac setup.sh /home/miac/build/
+##RUN chown miac:miac /home/miac/build/setup.sh
+#RUN bash -x -c 'source /home/miac/build/setup.sh'
+
+RUN chown -R miac:miac /home/miac
+
+ENV MIAC_HOSTNAME=
+ENV MIAC_ADMIN_EMAIL=
+ENV MIAC_ADMIN_PW=
+ENV MIAC_TIMEZONE=Etc/UTC

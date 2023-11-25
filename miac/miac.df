@@ -1,0 +1,34 @@
+FROM miac-install
+
+# Mail-in-a-Box and third party packages
+COPY --chown=miac:miac packages/mailinabox/mailinabox/ /home/miac/mailinabox/
+
+# Minor tweaks to Mail-in-a-box build
+COPY --chown=miac:miac seds.sh /home/miac/build/
+RUN /home/miac/build/seds.sh
+#RUN bash -x -c 'source /home/miac/build/seds.sh'
+
+# RUN mv /home/miac/mailinabox/setup/webmail.sh /home/miac/mailinabox/setup/webmail.sh.ORIG
+# COPY --chown=miac:miac webmail.sh /home/miac/mailinabox/setup/
+
+# RUN mv /home/miac/mailinabox/setup/nextcloud.sh /home/miac/mailinabox/setup/nextcloud.sh.ORIG
+# COPY --chown=miac:miac nextcloud.sh /home/miac/mailinabox/setup/
+
+COPY --chown=miac:miac miac.sh /home/miac/
+
+## Get Mail-in-a-box git repo
+## ./update-miac
+#COPY --chown=miac:miac setup.sh /home/miac/build/
+##RUN chown miac:miac /home/miac/build/setup.sh
+#RUN bash -x -c 'source /home/miac/build/setup.sh'
+
+#RUN chown -R miac:miac /home/miac
+
+ENV MIAC_HOSTNAME=
+ENV MIAC_ADMIN_EMAIL=
+ENV MIAC_ADMIN_PW=
+ENV MIAC_TIMEZONE=Etc/UTC
+
+ENV NONINTERACTIVE=1
+ENV SKIP_NETWORK_CHECKS=1
+ENV DISABLE_FIREWALL=1

@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Emit a motd login greeting
+
+[ -r /etc/lsb-release ] && . /etc/lsb-release
+# E.g.
+# DISTRIB_ID=Ubuntu
+# DISTRIB_RELEASE=22.04
+# DISTRIB_CODENAME=jammy
+# DISTRIB_DESCRIPTION="Ubuntu 22.04.1 LTS"
+
+if [ -z "$DISTRIB_DESCRIPTION" -a -x /usr/bin/lsb_release ]; then
+    # Fall back to using the very slow lsb_release utility
+    DISTRIB_DESCRIPTION=$(lsb_release -s -d)
+fi
+
+printf "\n"
+printf "Welcome to MIAC, Mail-in-a-Container, containerizing the excellent Mail-in-a-Box\n"
+printf "\n"
+printf "    %s (%s %s %s)\n" "$DISTRIB_DESCRIPTION" "$(uname -o)" "$(uname -r)" "$(uname -m)"
+printf "\n"
