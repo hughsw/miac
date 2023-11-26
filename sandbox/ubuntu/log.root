@@ -1,0 +1,8 @@
+Fresh Ubunutu 22.04_LTS
+
+root@localhost:~# history
+ 1  apt-get update
+ 2  apt-get upgrade
+ 3  apt-get dist-upgrade
+ 4  apt-get install emacs-nox
+ 
