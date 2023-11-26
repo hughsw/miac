@@ -1,0 +1,82 @@
+    1  exec screen -mAROD -e^^^^
+    2  exec emacs
+    3  exec sudo --login
+    4  sudo ls -la
+    5  pwd
+    6  cd miac/
+    7  podman pull docker.io/hughsw/miac-miab:v60.1miac1
+    8  cd sandbox/fedora/
+    9  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   10  podman container rm miac-miab
+   11  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   12  exec screen -mAROD -e^^^^
+   13  exec emacs
+   14  exec screen -mAROD -e^^^^
+   15  exec sudo --login
+   16  exec screen -mAROD -e^^^^
+   17  history
+   18  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   19  exec screen -mAROD -e^^^^
+   20  exec emacs
+   21  exec sudo --login
+   22  exec screen -mAROD -e^^^^
+   23  sudo systemctl stop firewalld
+   24  cd miac/
+   25  history
+   26  podman container rm miac-miab
+   27  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   28  ls
+   29  cd sandbox/fedora/
+   30  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   31  podman container rm miac-miab
+   32  podman run -d -p 8080:80 docker.io/traefik/whoami
+   33  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   34  podman container rm miac-miab
+   35  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   36  podman pull docker.io/hughsw/miac-miab:v60.1miac1
+   37  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   38  podman container rm miac-miab
+   39  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   40  podman container rm miac-miab
+   41  history
+   42  sudo systemctl start firewalld
+   43  sudo systemctl stop firewalld
+   44  git push
+   45  exit
+   46  podman ps
+   47  podman exec -it miac-miab emacs
+   48  pwd
+   49  cd miac/sandbox/fedora/
+   50  ls -la
+   51  ./miac miab:v60.1miac1 shed.cochleaudio.com
+   52  podman container start miac-miab
+   53  podman container attache miac-miab
+   54  podman container attach miac-miab
+   55  podman container start --attach miac-miab
+   56  exit
+   57  podman stop miac-miab
+   58  exit
+   59  exec screen -mAROD -e^^^^
+   60  exec emacs
+   61  printenv
+   62  exit
+   63  exec screen -mAROD -e^^^^
+   64  exec sudo --login
+   65  which sqlite
+   66  which sqlite3
+   67  cd
+   68  ls
+   69  cd miac/
+   70  git status
+   71  git push
+   72  git fetch
+   73  git status
+   74  git push
+   75  ssh-keygen
+   76  git push
+   77  git push --all origin
+   78  git checkout main
+   79  git merge
+   80  git status
+   81  git push --all origin
+   82  history >> history.txt
