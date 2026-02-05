@@ -22,11 +22,11 @@ db_path=$STORAGE_ROOT/mail/users.sqlite
 
 # Create an empty database if it doesn't yet exist.
 if [ ! -f "$db_path" ]; then
-	echo "Creating new user database: $db_path";
-	echo "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, extra, privileges TEXT NOT NULL DEFAULT '', quota TEXT NOT NULL DEFAULT '0');" | sqlite3 "$db_path";
-	echo "CREATE TABLE aliases (id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT NOT NULL UNIQUE, destination TEXT NOT NULL, permitted_senders TEXT);" | sqlite3 "$db_path";
-	echo "CREATE TABLE mfa (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, type TEXT NOT NULL, secret TEXT NOT NULL, mru_token TEXT, label TEXT, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);" | sqlite3 "$db_path";
-	echo "CREATE TABLE auto_aliases (id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT NOT NULL UNIQUE, destination TEXT NOT NULL, permitted_senders TEXT);" | sqlite3 "$db_path";
+    echo "Creating new user database: $db_path";
+    echo "CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL UNIQUE, password TEXT NOT NULL, extra, privileges TEXT NOT NULL DEFAULT '', quota TEXT NOT NULL DEFAULT '0');" | sqlite3 "$db_path";
+    echo "CREATE TABLE aliases (id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT NOT NULL UNIQUE, destination TEXT NOT NULL, permitted_senders TEXT);" | sqlite3 "$db_path";
+    echo "CREATE TABLE mfa (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, type TEXT NOT NULL, secret TEXT NOT NULL, mru_token TEXT, label TEXT, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE);" | sqlite3 "$db_path";
+    echo "CREATE TABLE auto_aliases (id INTEGER PRIMARY KEY AUTOINCREMENT, source TEXT NOT NULL UNIQUE, destination TEXT NOT NULL, permitted_senders TEXT);" | sqlite3 "$db_path";
 fi
 
 # ### User Authentication
@@ -76,9 +76,9 @@ EOF
 # correct, see #830), but we enable it specifically for the
 # submission port.
 tools/editconf.py /etc/postfix/main.cf \
-	smtpd_sasl_type=dovecot \
-	smtpd_sasl_path=private/auth \
-	smtpd_sasl_auth_enable=no
+	          smtpd_sasl_type=dovecot \
+	          smtpd_sasl_path=private/auth \
+	          smtpd_sasl_auth_enable=no
 
 # ### Sender Validation
 
@@ -89,7 +89,7 @@ tools/editconf.py /etc/postfix/main.cf \
 # who authenticated. An SQL query will find who are the owners of any given
 # address.
 tools/editconf.py /etc/postfix/main.cf \
-	smtpd_sender_login_maps=sqlite:/etc/postfix/sender-login-maps.cf
+	          smtpd_sender_login_maps=sqlite:/etc/postfix/sender-login-maps.cf
 
 # Postfix will query the exact address first, where the priority will be alias
 # records first, then user records. If there are no matches for the exact
@@ -109,11 +109,11 @@ EOF
 # not support it, and if a message is received with the SMTPUTF8 flag it will
 # bounce.
 tools/editconf.py /etc/postfix/main.cf \
-	smtputf8_enable=no \
-	virtual_mailbox_domains=sqlite:/etc/postfix/virtual-mailbox-domains.cf \
-	virtual_mailbox_maps=sqlite:/etc/postfix/virtual-mailbox-maps.cf \
-	virtual_alias_maps=sqlite:/etc/postfix/virtual-alias-maps.cf \
-	local_recipient_maps=\$virtual_mailbox_maps
+	          smtputf8_enable=no \
+	          virtual_mailbox_domains=sqlite:/etc/postfix/virtual-mailbox-domains.cf \
+	          virtual_mailbox_maps=sqlite:/etc/postfix/virtual-mailbox-maps.cf \
+	          virtual_alias_maps=sqlite:/etc/postfix/virtual-alias-maps.cf \
+	          local_recipient_maps=\$virtual_mailbox_maps
 
 # SQL statement to check if we handle incoming mail for a domain, either for users or aliases.
 cat > /etc/postfix/virtual-mailbox-domains.cf << EOF;
@@ -156,11 +156,15 @@ dbpath=$db_path
 query = SELECT destination from (SELECT destination, 0 as priority FROM aliases WHERE source='%s' AND destination<>'' UNION SELECT email as destination, 1 as priority FROM users WHERE email='%s' UNION SELECT destination, 2 as priority FROM auto_aliases WHERE source='%s' AND destination<>'') ORDER BY priority LIMIT 1;
 EOF
 
-# Restart Services
-##################
+configure_site && {
+    # Restart Services
+    ##################
 
-restart_service postfix
-restart_service dovecot
+    restart_service postfix
+    restart_service dovecot
 
-# force a recalculation of all user quotas
-doveadm quota recalc -A
+    # force a recalculation of all user quotas
+    doveadm quota recalc -A
+} # configure_site
+
+true

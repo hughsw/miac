@@ -28,8 +28,8 @@ configure_site && {
 
 echo "Installing Dovecot (IMAP server)..."
 apt_install \
-	dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-sqlite sqlite3 \
-	dovecot-sieve dovecot-managesieved
+    dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-sqlite sqlite3 \
+    dovecot-sieve dovecot-managesieved
 
 # The `dovecot-imapd`, `dovecot-pop3d`, and `dovecot-lmtpd` packages automatically
 # enable IMAP, POP and LMTP protocols.
@@ -48,9 +48,9 @@ apt_install \
 # - https://www.dovecot.org/list/dovecot/2012-August/137569.html
 # - https://www.dovecot.org/list/dovecot/2011-December/132455.html
 tools/editconf.py /etc/dovecot/conf.d/10-master.conf \
-	default_process_limit="$(($(nproc) * 250))" \
-	default_vsz_limit="$(($(free -tm  | tail -1 | awk '{print $2}') / 3))M" \
-	log_path=/var/log/mail.log
+	          default_process_limit="$(($(nproc) * 250))" \
+	          default_vsz_limit="$(($(free -tm  | tail -1 | awk '{print $2}') / 3))M" \
+	          log_path=/var/log/mail.log
 
 # The inotify `max_user_instances` default is 128, which constrains
 # the total number of watched (IMAP IDLE push) folders by open connections.
@@ -58,21 +58,21 @@ tools/editconf.py /etc/dovecot/conf.d/10-master.conf \
 # A reboot is required for this to take effect (which we don't do as
 # as a part of setup). Test with `cat /proc/sys/fs/inotify/max_user_instances`.
 tools/editconf.py /etc/sysctl.conf \
-	fs.inotify.max_user_instances=1024
+	          fs.inotify.max_user_instances=1024
 
 # Set the location where we'll store user mailboxes. '%d' is the domain name and '%n' is the
 # username part of the user's email address. We'll ensure that no bad domains or email addresses
 # are created within the management daemon.
 tools/editconf.py /etc/dovecot/conf.d/10-mail.conf \
-	mail_location="maildir:$STORAGE_ROOT/mail/mailboxes/%d/%n" \
-	mail_privileged_group=mail \
-	first_valid_uid=0
+	          mail_location="maildir:$STORAGE_ROOT/mail/mailboxes/%d/%n" \
+	          mail_privileged_group=mail \
+	          first_valid_uid=0
 
 # Create, subscribe, and mark as special folders: INBOX, Drafts, Sent, Trash, Spam and Archive.
 cp conf/dovecot-mailboxes.conf /etc/dovecot/conf.d/15-mailboxes.conf
 sed -i "s/#mail_plugins =\(.*\)/mail_plugins =\1 \$mail_plugins quota/" /etc/dovecot/conf.d/10-mail.conf
 if ! grep -q "mail_plugins.* imap_quota" /etc/dovecot/conf.d/20-imap.conf; then
-  sed -i "s/\(mail_plugins =.*\)/\1\n  mail_plugins = \$mail_plugins imap_quota/" /etc/dovecot/conf.d/20-imap.conf
+    sed -i "s/\(mail_plugins =.*\)/\1\n  mail_plugins = \$mail_plugins imap_quota/" /etc/dovecot/conf.d/20-imap.conf
 fi
 
 # configure stuff for quota support
@@ -103,21 +103,23 @@ fi
 # The LOGIN mechanism is supposedly for Microsoft products like Outlook to do SMTP login (I guess
 # since we're using Dovecot to handle SMTP authentication?).
 tools/editconf.py /etc/dovecot/conf.d/10-auth.conf \
-	disable_plaintext_auth=yes \
-	"auth_mechanisms=plain login"
+	          disable_plaintext_auth=yes \
+	          "auth_mechanisms=plain login"
 
-# Enable SSL, specify the location of the SSL certificate and private key files.
-# Use Mozilla's "Intermediate" recommendations at https://ssl-config.mozilla.org/#server=dovecot&server-version=2.2.33&config=intermediate&openssl-version=1.1.1,
-# except that the current version of Dovecot does not have a TLSv1.3 setting, so we only use TLSv1.2.
-tools/editconf.py /etc/dovecot/conf.d/10-ssl.conf \
-	ssl=required \
-	"ssl_cert=<$STORAGE_ROOT/ssl/ssl_certificate.pem" \
-	"ssl_key=<$STORAGE_ROOT/ssl/ssl_private_key.pem" \
-	"ssl_min_protocol=TLSv1.2" \
-	"ssl_cipher_list=ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384" \
-	"ssl_prefer_server_ciphers=no" \
-	"ssl_dh_parameters_length=2048" \
-	"ssl_dh=<$STORAGE_ROOT/ssl/dh2048.pem"
+configure_site && {
+    # Enable SSL, specify the location of the SSL certificate and private key files.
+    # Use Mozilla's "Intermediate" recommendations at https://ssl-config.mozilla.org/#server=dovecot&server-version=2.2.33&config=intermediate&openssl-version=1.1.1,
+    # except that the current version of Dovecot does not have a TLSv1.3 setting, so we only use TLSv1.2.
+    tools/editconf.py /etc/dovecot/conf.d/10-ssl.conf \
+	              ssl=required \
+	              "ssl_cert=<$STORAGE_ROOT/ssl/ssl_certificate.pem" \
+	              "ssl_key=<$STORAGE_ROOT/ssl/ssl_private_key.pem" \
+	              "ssl_min_protocol=TLSv1.2" \
+	              "ssl_cipher_list=ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384" \
+	              "ssl_prefer_server_ciphers=no" \
+	              "ssl_dh_parameters_length=2048" \
+	              "ssl_dh=<$STORAGE_ROOT/ssl/dh2048.pem"
+} # configure_site
 
 # Disable in-the-clear IMAP/POP because there is no reason for a user to transmit
 # login credentials outside of an encrypted connection. Only the over-TLS versions
@@ -133,14 +135,14 @@ sed -i "s/#port = 110/port = 0/" /etc/dovecot/conf.d/10-master.conf
 # by a peer. See [#129](https://github.com/mail-in-a-box/mailinabox/issues/129)
 # and [How bad is IMAP IDLE](http://razor.occams.info/blog/2014/08/09/how-bad-is-imap-idle/).
 tools/editconf.py /etc/dovecot/conf.d/20-imap.conf \
-	imap_idle_notify_interval="4 mins"
+	          imap_idle_notify_interval="4 mins"
 
 # Set POP3 UIDL.
 # UIDLs are used by POP3 clients to keep track of what messages they've downloaded.
 # For new POP3 servers, the easiest way to set up UIDLs is to use IMAP's UIDVALIDITY
 # and UID values, the default in Dovecot.
 tools/editconf.py /etc/dovecot/conf.d/20-pop3.conf \
-	pop3_uidl_format="%08Xu%08Xv"
+	          pop3_uidl_format="%08Xu%08Xv"
 
 # ### LDA (LMTP)
 
@@ -178,10 +180,12 @@ protocol imap {
 }
 EOF
 
-# Setting a `postmaster_address` is required or LMTP won't start. An alias
-# will be created automatically by our management daemon.
-tools/editconf.py /etc/dovecot/conf.d/15-lda.conf \
-	"postmaster_address=postmaster@$PRIMARY_HOSTNAME"
+configure_site && {
+    # Setting a `postmaster_address` is required or LMTP won't start. An alias
+    # will be created automatically by our management daemon.
+    tools/editconf.py /etc/dovecot/conf.d/15-lda.conf \
+	              "postmaster_address=postmaster@$PRIMARY_HOSTNAME"
+} # configure_site
 
 # ### Sieve
 
@@ -246,5 +250,9 @@ ufw_allow pop3s
 # Allow the Sieve port in the firewall.
 ufw_allow sieve
 
-# Restart services.
-restart_service dovecot
+configure_site && {
+    # Restart services.
+    restart_service dovecot
+} # configure_site
+
+true

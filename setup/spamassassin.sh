@@ -27,7 +27,7 @@ apt_install spampd razor pyzor dovecot-antispam libmail-dkim-perl
 
 # Allow spamassassin to download new rules.
 tools/editconf.py /etc/default/spamassassin \
-	CRON=1
+	          CRON=1
 
 # Configure pyzor, which is a client to a live database of hashes of
 # spam emails. Set the pyzor configuration directory to something sane.
@@ -38,7 +38,7 @@ tools/editconf.py /etc/default/spamassassin \
 # something happening on Sourceforge (#496).
 rm -rf ~/.pyzor
 tools/editconf.py /etc/spamassassin/local.cf -s \
-	pyzor_options="--homedir /etc/spamassassin/pyzor"
+	          pyzor_options="--homedir /etc/spamassassin/pyzor"
 mkdir -p /etc/spamassassin/pyzor
 echo "public.pyzor.org:24441" > /etc/spamassassin/pyzor/servers
 # check with: pyzor --homedir /etc/mail/spamassassin/pyzor ping
@@ -50,9 +50,9 @@ echo "public.pyzor.org:24441" > /etc/spamassassin/pyzor/servers
 #   is Spamassassin (spamc)'s own default. Specified in KBytes.
 # * Disable localmode so Pyzor, DKIM and DNS checks can be used.
 tools/editconf.py /etc/default/spampd \
-	DESTPORT=10026 \
-	ADDOPTS="\"--maxsize=2000\"" \
-	LOCALONLY=0
+	          DESTPORT=10026 \
+	          ADDOPTS="\"--maxsize=2000\"" \
+	          LOCALONLY=0
 
 # Spamassassin normally wraps spam as an attachment inside a fresh
 # email with a report about the message. This also protects the user
@@ -66,25 +66,26 @@ tools/editconf.py /etc/default/spampd \
 # Tell Spamassassin not to modify the original message except for adding
 # the X-Spam-Status & X-Spam-Score mail headers and related headers.
 tools/editconf.py /etc/spamassassin/local.cf -s \
-	report_safe=0 \
-	"add_header all Report"=_REPORT_ \
-	"add_header all Score"=_SCORE_
+	          report_safe=0 \
+	          "add_header all Report"=_REPORT_ \
+	          "add_header all Score"=_SCORE_
 
 
-# Authentication-Results SPF/Dmarc checks
-# ---------------------------------------
-# OpenDKIM and OpenDMARC are configured to validate and add "Authentication-Results: ..."
-# headers by checking the sender's SPF & DMARC policies. Instead of blocking mail that fails
-# these checks, we can use these headers to evaluate the mail as spam.
-#
-# Our custom rules are added to their own file so that an update to the deb package config
-# does not remove our changes.
-#
-# We need to escape period's in $PRIMARY_HOSTNAME since spamassassin config uses regex.
+configure_site && {
+    # Authentication-Results SPF/Dmarc checks
+    # ---------------------------------------
+    # OpenDKIM and OpenDMARC are configured to validate and add "Authentication-Results: ..."
+    # headers by checking the sender's SPF & DMARC policies. Instead of blocking mail that fails
+    # these checks, we can use these headers to evaluate the mail as spam.
+    #
+    # Our custom rules are added to their own file so that an update to the deb package config
+    # does not remove our changes.
+    #
+    # We need to escape period's in $PRIMARY_HOSTNAME since spamassassin config uses regex.
 
-escapedprimaryhostname="${PRIMARY_HOSTNAME//./\\.}"
+    escapedprimaryhostname="${PRIMARY_HOSTNAME//./\\.}"
 
-cat > /etc/spamassassin/miab_spf_dmarc.cf << EOF
+    cat > /etc/spamassassin/miab_spf_dmarc.cf << EOF
 # Evaluate DMARC Authentication-Results
 header DMARC_PASS Authentication-Results =~ /$escapedprimaryhostname; dmarc=pass/
 describe DMARC_PASS DMARC check passed
@@ -120,6 +121,8 @@ describe SPF_FAIL SPF check failed
 score SPF_FAIL 5.0
 EOF
 
+} # configure_site
+
 # Bayesean learning
 # -----------------
 #
@@ -138,8 +141,8 @@ EOF
 # the filemode in the config file.
 
 tools/editconf.py /etc/spamassassin/local.cf -s \
-	bayes_path="$STORAGE_ROOT/mail/spamassassin/bayes" \
-	bayes_file_mode=0666
+	          bayes_path="$STORAGE_ROOT/mail/spamassassin/bayes" \
+	          bayes_file_mode=0666
 
 mkdir -p "$STORAGE_ROOT/mail/spamassassin"
 chown -R spampd:spampd "$STORAGE_ROOT/mail/spamassassin"
@@ -170,7 +173,7 @@ EOF
 # so that it can access the learning files.
 
 tools/editconf.py /etc/dovecot/conf.d/10-mail.conf \
-	mail_access_groups=spampd
+	          mail_access_groups=spampd
 
 # Here's the script that the antispam plugin executes. It spools the message into
 # a temporary file and then runs sa-learn on it.
@@ -190,11 +193,15 @@ sudo -u spampd /usr/bin/sa-learn --sync 2>/dev/null
 chmod -R 660 "$STORAGE_ROOT/mail/spamassassin"
 chmod 770 "$STORAGE_ROOT/mail/spamassassin"
 
-# Initial training?
-# sa-learn --ham storage/mail/mailboxes/*/*/cur/
-# sa-learn --spam storage/mail/mailboxes/*/*/.Spam/cur/
+configure_site && {
+    # Initial training?
+    # sa-learn --ham storage/mail/mailboxes/*/*/cur/
+    # sa-learn --spam storage/mail/mailboxes/*/*/.Spam/cur/
 
-# Kick services.
-restart_service spampd
-restart_service dovecot
+    # Kick services.
+    restart_service spampd
+    restart_service dovecot
 
+} # configure_site
+
+true

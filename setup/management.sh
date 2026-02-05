@@ -30,13 +30,13 @@ inst_dir=/usr/local/lib/mailinabox
 mkdir -p $inst_dir
 venv=$inst_dir/env
 if [ ! -d $venv ]; then
-	# A bug specific to Ubuntu 22.04 and Python 3.10 requires
-	# forcing a virtualenv directory layout option (see #2335
-	# and https://github.com/pypa/virtualenv/pull/2415). In
-	# our issue, reportedly installing python3-distutils didn't
-	# fix the problem.)
-	export DEB_PYTHON_INSTALL_LAYOUT='deb'
-	hide_output virtualenv -ppython3 $venv
+    # A bug specific to Ubuntu 22.04 and Python 3.10 requires
+    # forcing a virtualenv directory layout option (see #2335
+    # and https://github.com/pypa/virtualenv/pull/2415). In
+    # our issue, reportedly installing python3-distutils didn't
+    # fix the problem.)
+    export DEB_PYTHON_INSTALL_LAYOUT='deb'
+    hide_output virtualenv -ppython3 $venv
 fi
 
 # Upgrade pip because the Ubuntu-packaged version is out of date.
@@ -46,19 +46,22 @@ hide_output $venv/bin/pip install --upgrade pip
 # The first line is the packages that Josh maintains himself!
 # NOTE: email_validator is repeated in setup/questions.sh, so please keep the versions synced.
 hide_output $venv/bin/pip install --upgrade \
-	rtyaml "email_validator>=1.0.0" "exclusiveprocess" \
-	flask dnspython python-dateutil expiringdict gunicorn \
-	qrcode[pil] pyotp \
-	"idna>=2.0.0" "cryptography==37.0.2" psutil postfix-mta-sts-resolver \
-	b2sdk boto3
+	    rtyaml "email_validator>=1.0.0" "exclusiveprocess" \
+	    flask dnspython python-dateutil expiringdict gunicorn \
+	    qrcode[pil] pyotp \
+	    "idna>=2.0.0" "cryptography==37.0.2" psutil postfix-mta-sts-resolver \
+	    b2sdk boto3
 
 # CONFIGURATION
 
 # Create a backup directory and a random key for encrypting backups.
 mkdir -p "$STORAGE_ROOT/backup"
-if [ ! -f "$STORAGE_ROOT/backup/secret_key.txt" ]; then
+
+configure_site && {
+    if [ ! -f "$STORAGE_ROOT/backup/secret_key.txt" ]; then
 	(umask 077; openssl rand -base64 2048 > "$STORAGE_ROOT/backup/secret_key.txt")
-fi
+    fi
+} # configure_site
 
 
 # Download jQuery and Bootstrap local files
@@ -108,19 +111,24 @@ exec gunicorn -b localhost:10222 -w 1 --timeout 630 wsgi:app
 EOF
 chmod +x $inst_dir/start
 cp --remove-destination conf/mailinabox.service /lib/systemd/system/mailinabox.service # target was previously a symlink so remove it first
-hide_output systemctl link -f /lib/systemd/system/mailinabox.service
-hide_output systemctl daemon-reload
-hide_output systemctl enable mailinabox.service
 
-# Perform nightly tasks at 3am in system time: take a backup, run
-# status checks and email the administrator any changes.
+configure_site && {
+    hide_output systemctl link -f /lib/systemd/system/mailinabox.service
+    hide_output systemctl daemon-reload
+    hide_output systemctl enable mailinabox.service
 
-minute=$((RANDOM % 60))  # avoid overloading mailinabox.email
-cat > /etc/cron.d/mailinabox-nightly << EOF;
+    # Perform nightly tasks at 3am in system time: take a backup, run
+    # status checks and email the administrator any changes.
+
+    minute=$((RANDOM % 60))  # avoid overloading mailinabox.email
+    cat > /etc/cron.d/mailinabox-nightly << EOF;
 # Mail-in-a-Box --- Do not edit / will be overwritten on update.
 # Run nightly tasks: backup, status checks.
 $minute 1 * * *	root	(cd $PWD && management/daily_tasks.sh)
 EOF
 
-# Start the management server.
-restart_service mailinabox
+    # Start the management server.
+    restart_service mailinabox
+} # configure_site
+
+true
