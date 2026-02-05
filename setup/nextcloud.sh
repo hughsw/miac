@@ -3,7 +3,10 @@
 ##########################
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 # ### Installing Nextcloud
 

@@ -8,7 +8,10 @@
 # mail users & aliases created by the user later.
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 # Prepare nsd's configuration.
 # We configure nsd before installation as we only want it to bind to some addresses

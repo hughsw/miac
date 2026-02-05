@@ -22,7 +22,10 @@
 # provides Perfect Forward Secrecy.
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 # Show a status line if we are going to take any action in this file.
 if  [ ! -f /usr/bin/openssl ] \

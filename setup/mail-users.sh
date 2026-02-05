@@ -8,7 +8,10 @@
 # validation by querying an Sqlite3 database of mail users.
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 # ### User and Alias Database
 

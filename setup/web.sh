@@ -3,7 +3,10 @@
 #################################################
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 # Some Ubuntu images start off with Apache. Remove it since we
 # will use nginx. Use autoremove to remove any Apache dependencies.

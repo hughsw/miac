@@ -1,7 +1,10 @@
 #!/bin/bash
 
 source setup/functions.sh
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 echo "Installing Mail-in-a-Box system management daemon..."
 

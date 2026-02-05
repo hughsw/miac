@@ -1,5 +1,8 @@
 #!/bin/bash
-source /etc/mailinabox.conf
+
+configure_site && {
+    source /etc/mailinabox.conf
+} # configure_site
 source setup/functions.sh # load our functions
 
 # Basic System Configuration

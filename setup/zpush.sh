@@ -11,7 +11,10 @@
 # Thanks to http://frontender.ch/publikationen/push-mail-server-using-nginx-and-z-push.html.
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 # Prereqs.
 

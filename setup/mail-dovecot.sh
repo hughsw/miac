@@ -16,7 +16,10 @@
 # using the LMTP protocol.
 
 source setup/functions.sh # load our functions
-source /etc/mailinabox.conf # load global vars
+
+configure_site && {
+    source /etc/mailinabox.conf # load global vars
+} # configure_site
 
 
 # Install packages for dovecot. These are all core dovecot plugins,
