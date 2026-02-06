@@ -268,8 +268,10 @@ tools/editconf.py /etc/default/postgrey \
 
 # If the $STORAGE_ROOT/mail/postgrey is empty, copy the postgrey database over from the old location
 if [ ! -d "$STORAGE_ROOT/mail/postgrey/db" ]; then
-    # Stop the service
-    service postgrey stop
+    configure_site && {
+        # Stop the service
+        service postgrey stop
+    } # configure_site
     # Ensure the new paths for postgrey db exists
     mkdir -p "$STORAGE_ROOT/mail/postgrey/db"
     # Move over database files
