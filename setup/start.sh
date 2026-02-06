@@ -27,8 +27,9 @@ export LC_TYPE=en_US.UTF-8
 # Fix so line drawing characters are shown correctly in Putty on Windows. See #744.
 export NCURSES_NO_UTF8_ACS=1
 
-# Recall the last settings used if we're running this a second time.
-if [ -f /etc/mailinabox.conf ]; then
+configure_site && {
+    # Recall the last settings used if we're running this a second time.
+    if [ -f /etc/mailinabox.conf ]; then
 	# Run any system migrations before proceeding. Since this is a second run,
 	# we assume we have Python already installed.
 	setup/migrate.py --migrate || exit 1
@@ -38,9 +39,10 @@ if [ -f /etc/mailinabox.conf ]; then
 	cat /etc/mailinabox.conf | sed s/^/DEFAULT_/ > /tmp/mailinabox.prev.conf
 	source /tmp/mailinabox.prev.conf
 	rm -f /tmp/mailinabox.prev.conf
-else
+    else
 	FIRST_TIME_SETUP=1
-fi
+    fi
+} # configure_site
 
 # Put a start script in a global location. We tell the user to run 'mailinabox'
 # in the first dialog prompt, so we should do this before that starts.
@@ -61,9 +63,9 @@ source setup/questions.sh
 # Skip on existing installs since we don't want this to block the ability to
 # upgrade, and these checks are also in the control panel status checks.
 if [ -z "${DEFAULT_PRIMARY_HOSTNAME:-}" ]; then
-if [ -z "${SKIP_NETWORK_CHECKS:-}" ]; then
+    if [ -z "${SKIP_NETWORK_CHECKS:-}" ]; then
 	source setup/network-checks.sh
-fi
+    fi
 fi
 
 # Create the STORAGE_USER and STORAGE_ROOT directory if they don't already exist.
@@ -76,23 +78,24 @@ fi
 # installation to that directory and write the file to contain the current
 # migration number for this version of Mail-in-a-Box.
 if ! id -u "$STORAGE_USER" >/dev/null 2>&1; then
-	useradd -m "$STORAGE_USER"
+    useradd -m "$STORAGE_USER"
 fi
 if [ ! -d "$STORAGE_ROOT" ]; then
-	mkdir -p "$STORAGE_ROOT"
+    mkdir -p "$STORAGE_ROOT"
 fi
 f=$STORAGE_ROOT
 while [[ $f != / ]]; do chmod a+rx "$f"; f=$(dirname "$f"); done;
 if [ ! -f "$STORAGE_ROOT/mailinabox.version" ]; then
-	setup/migrate.py --current > "$STORAGE_ROOT/mailinabox.version"
-	chown "$STORAGE_USER:$STORAGE_USER" "$STORAGE_ROOT/mailinabox.version"
+    setup/migrate.py --current > "$STORAGE_ROOT/mailinabox.version"
+    chown "$STORAGE_USER:$STORAGE_USER" "$STORAGE_ROOT/mailinabox.version"
 fi
 
-# Save the global options in /etc/mailinabox.conf so that standalone
-# tools know where to look for data. The default MTA_STS_MODE setting
-# is blank unless set by an environment variable, but see web.sh for
-# how that is interpreted.
-cat > /etc/mailinabox.conf << EOF;
+configure_site && {
+    # Save the global options in /etc/mailinabox.conf so that standalone
+    # tools know where to look for data. The default MTA_STS_MODE setting
+    # is blank unless set by an environment variable, but see web.sh for
+    # how that is interpreted.
+    cat > /etc/mailinabox.conf << EOF;
 STORAGE_USER=$STORAGE_USER
 STORAGE_ROOT=$STORAGE_ROOT
 PRIMARY_HOSTNAME=$PRIMARY_HOSTNAME
@@ -102,6 +105,7 @@ PRIVATE_IP=$PRIVATE_IP
 PRIVATE_IPV6=$PRIVATE_IPV6
 MTA_STS_MODE=${DEFAULT_MTA_STS_MODE:-enforce}
 EOF
+} # configure_site
 
 # Start service configuration.
 source setup/system.sh
@@ -119,64 +123,68 @@ source setup/zpush.sh
 source setup/management.sh
 source setup/munin.sh
 
-# Wait for the management daemon to start...
-until nc -z -w 4 127.0.0.1 10222
-do
+configure_site && {
+    # Wait for the management daemon to start...
+    until nc -z -w 4 127.0.0.1 10222
+    do
 	echo "Waiting for the Mail-in-a-Box management daemon to start..."
 	sleep 2
-done
+    done
 
-# ...and then have it write the DNS and nginx configuration files and start those
-# services.
-tools/dns_update
-tools/web_update
+    # ...and then have it write the DNS and nginx configuration files and start those
+    # services.
+    tools/dns_update
+    tools/web_update
 
-# Give fail2ban another restart. The log files may not all have been present when
-# fail2ban was first configured, but they should exist now.
-restart_service fail2ban
+    # Give fail2ban another restart. The log files may not all have been present when
+    # fail2ban was first configured, but they should exist now.
+    restart_service fail2ban
 
-# If there aren't any mail users yet, create one.
-source setup/firstuser.sh
+    # If there aren't any mail users yet, create one.
+    source setup/firstuser.sh
 
-# Register with Let's Encrypt, including agreeing to the Terms of Service.
-# We'd let certbot ask the user interactively, but when this script is
-# run in the recommended curl-pipe-to-bash method there is no TTY and
-# certbot will fail if it tries to ask.
-if [ ! -d "$STORAGE_ROOT/ssl/lets_encrypt/accounts/acme-v02.api.letsencrypt.org/" ]; then
-echo
-echo "-----------------------------------------------"
-echo "Mail-in-a-Box uses Let's Encrypt to provision free SSL/TLS certificates"
-echo "to enable HTTPS connections to your box. We're automatically"
-echo "agreeing you to their subscriber agreement. See https://letsencrypt.org."
-echo
-certbot register --register-unsafely-without-email --agree-tos --config-dir "$STORAGE_ROOT/ssl/lets_encrypt"
-fi
+    # Register with Let's Encrypt, including agreeing to the Terms of Service.
+    # We'd let certbot ask the user interactively, but when this script is
+    # run in the recommended curl-pipe-to-bash method there is no TTY and
+    # certbot will fail if it tries to ask.
+    if [ ! -d "$STORAGE_ROOT/ssl/lets_encrypt/accounts/acme-v02.api.letsencrypt.org/" ]; then
+        echo
+        echo "-----------------------------------------------"
+        echo "Mail-in-a-Box uses Let's Encrypt to provision free SSL/TLS certificates"
+        echo "to enable HTTPS connections to your box. We're automatically"
+        echo "agreeing you to their subscriber agreement. See https://letsencrypt.org."
+        echo
+        certbot register --register-unsafely-without-email --agree-tos --config-dir "$STORAGE_ROOT/ssl/lets_encrypt"
+    fi
 
-# Done.
-echo
-echo "-----------------------------------------------"
-echo
-echo "Your Mail-in-a-Box is running."
-echo
-echo "Please log in to the control panel for further instructions at:"
-echo
-if management/status_checks.py --check-primary-hostname; then
+    # Done.
+    echo
+    echo "-----------------------------------------------"
+    echo
+    echo "Your Mail-in-a-Box is running."
+    echo
+    echo "Please log in to the control panel for further instructions at:"
+    echo
+    if management/status_checks.py --check-primary-hostname; then
 	# Show the nice URL if it appears to be resolving and has a valid certificate.
 	echo "https://$PRIMARY_HOSTNAME/admin"
 	echo
 	echo "If you have a DNS problem put the box's IP address in the URL"
 	echo "(https://$PUBLIC_IP/admin) but then check the TLS fingerprint:"
 	openssl x509 -in "$STORAGE_ROOT/ssl/ssl_certificate.pem" -noout -fingerprint -sha256\
-        	| sed "s/SHA256 Fingerprint=//i"
-else
+            | sed "s/SHA256 Fingerprint=//i"
+    else
 	echo "https://$PUBLIC_IP/admin"
 	echo
 	echo "You will be alerted that the website has an invalid certificate. Check that"
 	echo "the certificate fingerprint matches:"
 	echo
 	openssl x509 -in "$STORAGE_ROOT/ssl/ssl_certificate.pem" -noout -fingerprint -sha256\
-        	| sed "s/SHA256 Fingerprint=//i"
+            | sed "s/SHA256 Fingerprint=//i"
 	echo
 	echo "Then you can confirm the security exception and continue."
 	echo
-fi
+    fi
+} # configure_site
+
+true
