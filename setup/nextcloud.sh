@@ -162,7 +162,7 @@ InstallNextcloud() {
 	fi
     } # configure_site
     true
-} # InstallNextcloud
+} # InstallNextcloud()
 
 # Current Nextcloud Version, #1623
 # Checking /usr/local/lib/owncloud/version.php shows version of the Nextcloud application, not the DB

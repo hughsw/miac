@@ -56,19 +56,22 @@ EOF
 
     # Deactivate monitoring of network interfaces that are not up. Otherwise we can get a lot of empty charts.
     for f in $(find /etc/munin/plugins/ \( -lname /usr/share/munin/plugins/if_ -o -lname /usr/share/munin/plugins/if_err_ -o -lname /usr/share/munin/plugins/bonding_err_ \)); do
-	IF=$(echo "$f" | sed s/.*_//);
-	if ! grep -qFx up "/sys/class/net/$IF/operstate" 2>/dev/null; then
+        IF=$(echo "$f" | sed s/.*_//);
+        if ! grep -qFx up "/sys/class/net/$IF/operstate" 2>/dev/null; then
 	    rm "$f";
-	fi;
+        fi;
     done
+} # configure_site
 
-    # Create a 'state' directory. Not sure why we need to do this manually.
-    mkdir -p /var/lib/munin-node/plugin-state/
+# Create a 'state' directory. Not sure why we need to do this manually.
+mkdir -p /var/lib/munin-node/plugin-state/
 
-    # Create a systemd service for munin.
-    ln -sf "$PWD/management/munin_start.sh" /usr/local/lib/mailinabox/munin_start.sh
-    chmod 0744 /usr/local/lib/mailinabox/munin_start.sh
-    cp --remove-destination conf/munin.service /lib/systemd/system/munin.service # target was previously a symlink so remove first
+# Create a systemd service for munin.
+ln -sf "$PWD/management/munin_start.sh" /usr/local/lib/mailinabox/munin_start.sh
+chmod 0744 /usr/local/lib/mailinabox/munin_start.sh
+cp --remove-destination conf/munin.service /lib/systemd/system/munin.service # target was previously a symlink so remove first
+
+configure_site && {
     hide_output systemctl link -f /lib/systemd/system/munin.service
     hide_output systemctl daemon-reload
     hide_output systemctl unmask munin.service

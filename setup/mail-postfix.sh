@@ -47,9 +47,9 @@ configure_site && {
 echo "Installing Postfix (SMTP server)..."
 apt_install postfix postfix-sqlite postfix-pcre postgrey ca-certificates
 
-configure_site && {
-    # ### Basic Settings
+# ### Basic Settings
 
+configure_site && {
     # Set some basic settings...
     #
     # * Have postfix listen on all network interfaces.
@@ -65,6 +65,7 @@ configure_site && {
 	              smtpd_banner="\$myhostname ESMTP Hi, I'm a Mail-in-a-Box (Ubuntu/Postfix; see https://mailinabox.email/)" \
 	              mydestination=localhost
 } # configure_site
+
 
 # Tweak some queue settings:
 # * Inform users when their e-mail delivery is delayed more than 3 hours (default is not to warn).
@@ -129,31 +130,31 @@ configure_site && {
     # removing the 127.0.0.1 reference.
     sed -i "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" /etc/postfix/outgoing_mail_header_filters
     sed -i "s/PUBLIC_IP/$PUBLIC_IP/" /etc/postfix/outgoing_mail_header_filters
-
-    # Enable TLS on incoming connections. It is not required on port 25, allowing for opportunistic
-    # encryption. On ports 465 and 587 it is mandatory (see above). Shared and non-shared settings are
-    # given here. Shared settings include:
-    # * Require TLS before a user is allowed to authenticate.
-    # * Set the path to the server TLS certificate and 2048-bit DH parameters for old DH ciphers.
-    # For port 25 only:
-    # * Disable extremely old versions of TLS and extremely unsafe ciphers, but some mail servers out in
-    #   the world are very far behind and if we disable too much, they may not be able to use TLS and
-    #   won't fall back to cleartext. So we don't disable too much. smtpd_tls_exclude_ciphers applies to
-    #   both port 25 and port 587, but because we override the cipher list for both, it probably isn't used.
-    #   Use Mozilla's "Old" recommendations at https://ssl-config.mozilla.org/#server=postfix&server-version=3.3.0&config=old&openssl-version=1.1.1
-    tools/editconf.py /etc/postfix/main.cf \
-	              smtpd_tls_security_level=may\
-	              smtpd_tls_auth_only=yes \
-	              smtpd_tls_cert_file="$STORAGE_ROOT/ssl/ssl_certificate.pem" \
-	              smtpd_tls_key_file="$STORAGE_ROOT/ssl/ssl_private_key.pem" \
-	              smtpd_tls_dh1024_param_file="$STORAGE_ROOT/ssl/dh2048.pem" \
-	              smtpd_tls_protocols="!SSLv2,!SSLv3" \
-	              smtpd_tls_ciphers=medium \
-	              tls_medium_cipherlist=ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA \
-	              smtpd_tls_exclude_ciphers=aNULL,RC4 \
-	              tls_preempt_cipherlist=no \
-	              smtpd_tls_received_header=yes
 } # configure_site
+
+# Enable TLS on incoming connections. It is not required on port 25, allowing for opportunistic
+# encryption. On ports 465 and 587 it is mandatory (see above). Shared and non-shared settings are
+# given here. Shared settings include:
+# * Require TLS before a user is allowed to authenticate.
+# * Set the path to the server TLS certificate and 2048-bit DH parameters for old DH ciphers.
+# For port 25 only:
+# * Disable extremely old versions of TLS and extremely unsafe ciphers, but some mail servers out in
+#   the world are very far behind and if we disable too much, they may not be able to use TLS and
+#   won't fall back to cleartext. So we don't disable too much. smtpd_tls_exclude_ciphers applies to
+#   both port 25 and port 587, but because we override the cipher list for both, it probably isn't used.
+#   Use Mozilla's "Old" recommendations at https://ssl-config.mozilla.org/#server=postfix&server-version=3.3.0&config=old&openssl-version=1.1.1
+tools/editconf.py /etc/postfix/main.cf \
+	          smtpd_tls_security_level=may\
+	          smtpd_tls_auth_only=yes \
+	          smtpd_tls_cert_file="$STORAGE_ROOT/ssl/ssl_certificate.pem" \
+	          smtpd_tls_key_file="$STORAGE_ROOT/ssl/ssl_private_key.pem" \
+	          smtpd_tls_dh1024_param_file="$STORAGE_ROOT/ssl/dh2048.pem" \
+	          smtpd_tls_protocols="!SSLv2,!SSLv3" \
+	          smtpd_tls_ciphers=medium \
+	          tls_medium_cipherlist=ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA256:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA \
+	          smtpd_tls_exclude_ciphers=aNULL,RC4 \
+	          tls_preempt_cipherlist=no \
+	          smtpd_tls_received_header=yes
 
 # For ports 465/587 (via the 'mandatory' settings):
 # * Use Mozilla's "Intermediate" TLS recommendations from https://ssl-config.mozilla.org/#server=postfix&server-version=3.3.0&config=intermediate&openssl-version=1.1.1
@@ -306,9 +307,7 @@ fi
 EOF
 chmod +x /etc/cron.daily/mailinabox-postgrey-whitelist
 
-configure_site && {
-    /etc/cron.daily/mailinabox-postgrey-whitelist
-} # configure_site
+/etc/cron.daily/mailinabox-postgrey-whitelist
 
 # Increase the message size limit from 10MB to 128MB.
 # The same limit is specified in nginx.conf for mail submitted via webmail and Z-Push.

@@ -16,8 +16,10 @@ configure_site && {
     #
     # First set the hostname in the configuration file, then activate the setting
 
-    echo "$PRIMARY_HOSTNAME" > /etc/hostname
-    hostname "$PRIMARY_HOSTNAME"
+    configure_host && {
+        echo "$PRIMARY_HOSTNAME" > /etc/hostname
+        hostname "$PRIMARY_HOSTNAME"
+    } # configure_host
 
     # ### Fix permissions
 
@@ -364,9 +366,11 @@ fi
 # which is where bind9 will be running. Obviously don't do this before
 # installing bind9 or else apt won't be able to resolve a server to
 # download bind9 from.
-rm -f /etc/resolv.conf
 tools/editconf.py /etc/systemd/resolved.conf DNSStubListener=no
-echo "nameserver 127.0.0.1" > /etc/resolv.conf
+configure_host && {
+    rm -f /etc/resolv.conf
+    echo "nameserver 127.0.0.1" > /etc/resolv.conf
+} # configure_host
 
 configure_site && {
     # Restart the DNS services.

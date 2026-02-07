@@ -198,14 +198,12 @@ tools/editconf.py ${RCM_PLUGIN_DIR}/password/config.inc.php \
 # so PHP can use doveadm, for the password changing plugin
 usermod -a -G dovecot www-data
 
-configure_site && {
-    # set permissions so that PHP can use users.sqlite
-    # could use dovecot instead of www-data, but not sure it matters
-    chown root:www-data "$STORAGE_ROOT/mail"
-    chmod 775 "$STORAGE_ROOT/mail"
-    chown root:www-data "$STORAGE_ROOT/mail/users.sqlite"
-    chmod 664 "$STORAGE_ROOT/mail/users.sqlite"
-} # configure_site
+# set permissions so that PHP can use users.sqlite
+# could use dovecot instead of www-data, but not sure it matters
+chown root:www-data "$STORAGE_ROOT/mail"
+chmod 775 "$STORAGE_ROOT/mail"
+chown root:www-data "$STORAGE_ROOT/mail/users.sqlite"
+chmod 664 "$STORAGE_ROOT/mail/users.sqlite"
 
 # Fix Carddav permissions:
 chown -f -R root:www-data ${RCM_PLUGIN_DIR}/carddav
