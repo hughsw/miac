@@ -1,4 +1,4 @@
-
+#!/bin/bash
 
 # Determine if process is running on a stand-alone host, as part of an
 # image build, or in a container runtime
@@ -22,8 +22,8 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
 
         #ln -sf setup/configs/build-image.sh setup/setup-config.sh
     else
-        # verify in a container runtime
-        [[ container == podman || container == docker ]]
+        # containers set the container env var, so verify we're in a container runtime
+        [[ container == "podman" || container == "docker" ]]
 
         # We are a process in a running container, e.g. due to 'podman run ...' or  'docker run ...'
 
