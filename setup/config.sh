@@ -44,7 +44,8 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
 
     # Is it part of an image building 'RUN cmd ...'
     # Dockerfile RUN (appears to) always use '/bin/sh -c '...' in process 1
-    if grep -e '^/bin/sh\>' /proc/1/cmdline ; then
+    # The cmdline fiile has nulls between the exec arguments
+    if grep --binary-files=binary -e '^/bin/sh\>' /proc/1/cmdline ; then
         # We are building an image, so no site-specific logic, but do the image-building-specific logic
 
         # Skip code that depends on being in a container runtime, i.e. due to 'podman run ...'
