@@ -10,6 +10,17 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
         # RUN (appears to) always use '/bin/sh' '-c' in process 1
         # We are in a container, a step of building an image, i.e. part of a Dockerfile 'RUN cmd ...'
 
+        #export DISABLE_FIREWALL=1
+        export NONINTERACTIVE=1
+        export SKIP_NETWORK_CHECKS=1
+
+        #export PRIMARY_HOSTNAME=$(hostname)
+
+        export STORAGE_USER="miac"
+        export STORAGE_ROOT="/home/miac-data"
+        export PUBLIC_IP=auto
+        export PUBLIC_IPV6=auto
+
         # Skip code that depends on running in a host environment
         function configure_host {
             false
@@ -26,6 +37,17 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
         [[ container == "podman" || container == "docker" ]]
 
         # We are a process in a running container, e.g. due to 'podman run ...' or  'docker run ...'
+
+        #export DISABLE_FIREWALL=1
+        export NONINTERACTIVE=1
+        export SKIP_NETWORK_CHECKS=1
+
+        export PRIMARY_HOSTNAME=$(hostname)
+
+        export STORAGE_USER="miac"
+        export STORAGE_ROOT="/home/miac-data"
+        export PUBLIC_IP=auto
+        export PUBLIC_IPV6=auto
 
         # Skip code that depends on running on a host environment (bare metal, VPS instance, etc)
         function configure_host {
