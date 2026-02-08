@@ -31,6 +31,10 @@ apt_install \
     dovecot-core dovecot-imapd dovecot-pop3d dovecot-lmtpd dovecot-sqlite sqlite3 \
     dovecot-sieve dovecot-managesieved
 
+# This disabling isn't strictly necessary, but doing so prevents error
+# messages.  It gets enabled during configure_site runs.
+systemctl disable dovecot
+
 # The `dovecot-imapd`, `dovecot-pop3d`, and `dovecot-lmtpd` packages automatically
 # enable IMAP, POP and LMTP protocols.
 

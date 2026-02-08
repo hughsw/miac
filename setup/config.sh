@@ -3,7 +3,7 @@
 # Declare functions the are used to conditionalize the running of some of the code in setup/*.sh
 
 # Default is that we are running on a host, not in a container, so run
-# all code except that which is specific to building an OCI image
+# all code
 
 function configure_host {
     true
@@ -13,17 +13,13 @@ function configure_site {
     true
 }
 
-function configure_image {
-    false
-}
-
 
 # Re-declare functions if process is running in a container runtime,
 # and more-specifically as part of an image build
 
 # is process running in a container
 if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
-    # Skip code that depends on running in a host environment
+    # In any container, skip code that depends on running in a host environment
     function configure_host {
         false
     }
@@ -52,11 +48,6 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
         function configure_site {
             false
         }
-
-        # Run image configuration-specific code
-        function configure_image {
-            true
-        }
     else
         # We are a process in a running container, e.g. due to 'podman run ...' or  'docker run ...'
 
@@ -64,10 +55,5 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
         [[ container == "podman" || container == "docker" ]]
 
         export PRIMARY_HOSTNAME=$(hostname)
-
-        # Run code that depends on being in container runtime
-        function configure_site {
-            true
-        }
     fi
 fi

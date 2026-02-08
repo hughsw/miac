@@ -80,9 +80,8 @@ EOF
 echo "Installing nsd (DNS server)..."
 apt_install nsd ldnsutils openssh-client
 
-configure_image && {
-    systemctl disable nsd
-} # configure_image
+# Disable nsd so there's no fighting with bind9.  It gets activated whenever DNS is updated
+systemctl disable nsd
 
 # Create DNSSEC signing keys.
 
