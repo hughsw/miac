@@ -55,10 +55,7 @@ EOF
     echo "include: /etc/nsd/nsd.conf.d/*.conf" >> /etc/nsd/nsd.conf;
 
     systemctl endable nsd
-} || {
-    systemctl disable nsd
-} # configure_site
-
+}
 # Remove the old location of zones.conf that we generate. It will
 # now be stored in /etc/nsd/nsd.conf.d.
 rm -f /etc/nsd/zones.conf
@@ -82,6 +79,10 @@ EOF
 # * openssh-client: Provides ssh-keyscan which we use to create SSHFP records.
 echo "Installing nsd (DNS server)..."
 apt_install nsd ldnsutils openssh-client
+
+configure_image && {
+    systemctl disable nsd
+} # configure_image
 
 # Create DNSSEC signing keys.
 

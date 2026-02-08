@@ -1,75 +1,72 @@
 #!/bin/bash
 
-# Determine if process is running on a stand-alone host, as part of an
-# image build, or in a container runtime
+# Declare functions the are used to conditionalize the running of some of the code in setup/*.sh
+
+# Default is that we are running on a host, not in a container, so run
+# all code except that which is specific to building an OCI image
+
+function configure_host {
+    true
+}
+
+function configure_site {
+    true
+}
+
+function configure_image {
+    false
+}
+
+
+# Re-declare functions if process is running in a container runtime,
+# and more-specifically as part of an image build
 
 # is process running in a container
 if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
-    # is it part of an image building 'RUN cmd ...'
+    # Skip code that depends on running in a host environment
+    function configure_host {
+        false
+    }
+
+    # Env settings for container setup
+
+    #export DISABLE_FIREWALL=1
+    export NONINTERACTIVE=1
+    export SKIP_NETWORK_CHECKS=1
+
+    export PUBLIC_IP=auto
+    export PUBLIC_IPV6=auto
+
+    export STORAGE_USER="miac"
+    export STORAGE_ROOT="/home/miac-data"
+
+    #export PRIMARY_HOSTNAME=$(hostname)
+
+    # Is it part of an image building 'RUN cmd ...'
+    # Dockerfile RUN (appears to) always use '/bin/sh -c '...' in process 1
     if grep -e '^/bin/sh\>' /proc/1/cmdline ; then
-        # RUN (appears to) always use '/bin/sh' '-c' in process 1
-        # We are in a container, a step of building an image, i.e. part of a Dockerfile 'RUN cmd ...'
-
-        #export DISABLE_FIREWALL=1
-        export NONINTERACTIVE=1
-        export SKIP_NETWORK_CHECKS=1
-
-        #export PRIMARY_HOSTNAME=$(hostname)
-
-        export STORAGE_USER="miac"
-        export STORAGE_ROOT="/home/miac-data"
-        export PUBLIC_IP=auto
-        export PUBLIC_IPV6=auto
-
-        # Skip code that depends on running in a host environment
-        function configure_host {
-            false
-        }
+        # We are building an image, so no site-specific logic, but do the image-building-specific logic
 
         # Skip code that depends on being in a container runtime, i.e. due to 'podman run ...'
         function configure_site {
             false
         }
 
-        #ln -sf setup/configs/build-image.sh setup/setup-config.sh
+        # Run image configuration-specific code
+        function configure_image {
+            true
+        }
     else
-        # containers set the container env var, so verify we're in a container runtime
-        [[ container == "podman" || container == "docker" ]]
-
         # We are a process in a running container, e.g. due to 'podman run ...' or  'docker run ...'
 
-        #export DISABLE_FIREWALL=1
-        export NONINTERACTIVE=1
-        export SKIP_NETWORK_CHECKS=1
+        # Containers set the container env var, so verify we're in a container runtime
+        [[ container == "podman" || container == "docker" ]]
 
         export PRIMARY_HOSTNAME=$(hostname)
-
-        export STORAGE_USER="miac"
-        export STORAGE_ROOT="/home/miac-data"
-        export PUBLIC_IP=auto
-        export PUBLIC_IPV6=auto
-
-        # Skip code that depends on running on a host environment (bare metal, VPS instance, etc)
-        function configure_host {
-            false
-        }
 
         # Run code that depends on being in container runtime
         function configure_site {
             true
         }
-
-        #ln -sf setup/configs/run-container.sh setup/setup-config.sh
     fi
-else
-    # We are running on a host, not in a container, so run all code
-    function configure_host {
-        true
-    }
-
-    function configure_site {
-        true
-    }
-
-    #ln -sf setup/configs/host.sh setup/setup-config.sh
 fi
