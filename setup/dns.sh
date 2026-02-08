@@ -54,7 +54,7 @@ EOF
     # the zones.conf file written out by our management daemon.
     echo "include: /etc/nsd/nsd.conf.d/*.conf" >> /etc/nsd/nsd.conf;
 
-    systemctl endable nsd
+    systemctl enable nsd
 }
 # Remove the old location of zones.conf that we generate. It will
 # now be stored in /etc/nsd/nsd.conf.d.
