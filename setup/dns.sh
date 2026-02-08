@@ -21,7 +21,8 @@ mkdir -p /etc/nsd
 mkdir -p /etc/nsd/zones
 touch /etc/nsd/zones.conf
 
-cat > /etc/nsd/nsd.conf << EOF;
+configure_site && {
+    cat > /etc/nsd/nsd.conf << EOF;
 # Do not edit. Overwritten by Mail-in-a-Box setup.
 server:
   hide-version: yes
@@ -41,17 +42,22 @@ server:
 
 EOF
 
-# Since we have bind9 listening on localhost for locally-generated
-# DNS queries that require a recursive nameserver, and the system
-# might have other network interfaces for e.g. tunnelling, we have
-# to be specific about the network interfaces that nsd binds to.
-for ip in $PRIVATE_IP $PRIVATE_IPV6; do
-    echo "  ip-address: $ip" >> /etc/nsd/nsd.conf;
-done
+    # Since we have bind9 listening on localhost for locally-generated
+    # DNS queries that require a recursive nameserver, and the system
+    # might have other network interfaces for e.g. tunnelling, we have
+    # to be specific about the network interfaces that nsd binds to.
+    for ip in $PRIVATE_IP $PRIVATE_IPV6; do
+        echo "  ip-address: $ip" >> /etc/nsd/nsd.conf;
+    done
 
-# Create a directory for additional configuration directives, including
-# the zones.conf file written out by our management daemon.
-echo "include: /etc/nsd/nsd.conf.d/*.conf" >> /etc/nsd/nsd.conf;
+    # Create a directory for additional configuration directives, including
+    # the zones.conf file written out by our management daemon.
+    echo "include: /etc/nsd/nsd.conf.d/*.conf" >> /etc/nsd/nsd.conf;
+
+    systemctl endable nsd
+} || {
+    systemctl disable nsd
+} # configure_site
 
 # Remove the old location of zones.conf that we generate. It will
 # now be stored in /etc/nsd/nsd.conf.d.
