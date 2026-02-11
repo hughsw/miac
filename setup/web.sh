@@ -60,7 +60,7 @@ tools/editconf.py /etc/php/"$PHP_VER"/fpm/php.ini -c ';' \
 tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
 	          env[PATH]=/usr/local/bin:/usr/bin:/bin
 
-configure_site && {
+#configure_site && {
     # Configure php-fpm based on the amount of memory the machine has
     # This is based on the nextcloud manual for performance tuning: https://docs.nextcloud.com/server/17/admin_manual/installation/server_tuning.html
     # Some synchronisation issues can occur when many people access the site at once.
@@ -98,7 +98,7 @@ configure_site && {
                           pm.min_spare_servers=6 \
                           pm.max_spare_servers=18
     fi
-} # configure_site
+#} # configure_site
 
 # Other nginx settings will be configured by the management service
 # since it depends on what domains we're serving, which we don't know

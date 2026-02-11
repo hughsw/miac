@@ -31,7 +31,7 @@ export LC_TYPE=en_US.UTF-8
 # Fix so line drawing characters are shown correctly in Putty on Windows. See #744.
 export NCURSES_NO_UTF8_ACS=1
 
-configure_site && {
+#configure_site && {
     # Recall the last settings used if we're running this a second time.
     if [ -f /etc/mailinabox.conf ]; then
 	# Run any system migrations before proceeding. Since this is a second run,
@@ -46,7 +46,7 @@ configure_site && {
     else
 	FIRST_TIME_SETUP=1
     fi
-} # configure_site
+#} # configure_site
 
 # Put a start script in a global location. We tell the user to run 'mailinabox'
 # in the first dialog prompt, so we should do this before that starts.

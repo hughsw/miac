@@ -181,7 +181,7 @@ fi
 # from the version currently installed, do the install/upgrade
 if [ ! -d /usr/local/lib/owncloud/ ] || [[ ! ${CURRENT_NEXTCLOUD_VER} =~ ^$nextcloud_ver ]]; then
 
-    configure_site && {
+#    configure_site && {
 	# Stop php-fpm if running. If they are not running (which happens on a previously failed install), dont bail.
 	service php"$PHP_VER"-fpm stop &> /dev/null || /bin/true
 
@@ -247,7 +247,7 @@ if [ ! -d /usr/local/lib/owncloud/ ] || [[ ! ${CURRENT_NEXTCLOUD_VER} =~ ^$nextc
 		CURRENT_NEXTCLOUD_VER="25.0.7"
 	    fi
 	fi
-    } # configure_site
+#    } # configure_site
 
     InstallNextcloud $nextcloud_ver $nextcloud_hash $contacts_ver $contacts_hash $calendar_ver $calendar_hash $user_external_ver $user_external_hash
 fi
