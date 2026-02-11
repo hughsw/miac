@@ -145,7 +145,7 @@ configure_site && {
     restart_service fail2ban
 
     # If there aren't any mail users yet, create one.
-    source setup/firstuser.sh
+#MIAC    source setup/firstuser.sh
 
     # Register with Let's Encrypt, including agreeing to the Terms of Service.
     # We'd let certbot ask the user interactively, but when this script is
