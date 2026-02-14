@@ -136,32 +136,29 @@ InstallNextcloud() {
     # that error.
     chown -f -R www-data:www-data "$STORAGE_ROOT/owncloud" /usr/local/lib/owncloud || /bin/true
 
-    configure_site && {
-	# If this isn't a new installation, immediately run the upgrade script.
-	# Then check for success (0=ok and 3=no upgrade needed, both are success).
-	if [ -e "$STORAGE_ROOT/owncloud/owncloud.db" ]; then
-	    # ownCloud 8.1.1 broke upgrades. It may fail on the first attempt, but
-	    # that can be OK.
+    # If this isn't a new installation, immediately run the upgrade script.
+    # Then check for success (0=ok and 3=no upgrade needed, both are success).
+    if [ -e "$STORAGE_ROOT/owncloud/owncloud.db" ]; then
+	# ownCloud 8.1.1 broke upgrades. It may fail on the first attempt, but
+	# that can be OK.
+	sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ upgrade
+	E=$?
+	if [ $E -ne 0 ] && [ $E -ne 3 ]; then
+	    echo "Trying ownCloud upgrade again to work around ownCloud upgrade bug..."
 	    sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ upgrade
 	    E=$?
-	    if [ $E -ne 0 ] && [ $E -ne 3 ]; then
-		echo "Trying ownCloud upgrade again to work around ownCloud upgrade bug..."
-		sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ upgrade
-		E=$?
-		if [ $E -ne 0 ] && [ $E -ne 3 ]; then exit 1; fi
-		sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ maintenance:mode --off
-		echo "...which seemed to work."
-	    fi
-
-	    # Add missing indices. NextCloud didn't include this in the normal upgrade because it might take some time.
-	    sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ db:add-missing-indices
-	    sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ db:add-missing-primary-keys
-
-	    # Run conversion to BigInt identifiers, this process may take some time on large tables.
-	    sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ db:convert-filecache-bigint --no-interaction
+	    if [ $E -ne 0 ] && [ $E -ne 3 ]; then exit 1; fi
+	    sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ maintenance:mode --off
+	    echo "...which seemed to work."
 	fi
-    } # configure_site
-    true
+
+	# Add missing indices. NextCloud didn't include this in the normal upgrade because it might take some time.
+	sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ db:add-missing-indices
+	sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ db:add-missing-primary-keys
+
+	# Run conversion to BigInt identifiers, this process may take some time on large tables.
+	sudo -u www-data php"$PHP_VER" /usr/local/lib/owncloud/occ db:convert-filecache-bigint --no-interaction
+    fi
 } # InstallNextcloud()
 
 # Current Nextcloud Version, #1623
@@ -177,11 +174,12 @@ else
     CURRENT_NEXTCLOUD_VER=""
 fi
 
-# If the Nextcloud directory is missing (never been installed before, or the nextcloud version to be installed is different
-# from the version currently installed, do the install/upgrade
-if [ ! -d /usr/local/lib/owncloud/ ] || [[ ! ${CURRENT_NEXTCLOUD_VER} =~ ^$nextcloud_ver ]]; then
+configure_site && {
 
-#    configure_site && {
+    # If the Nextcloud directory is missing (never been installed before, or the nextcloud version to be installed is different
+    # from the version currently installed, do the install/upgrade
+    if [ ! -d /usr/local/lib/owncloud/ ] || [[ ! ${CURRENT_NEXTCLOUD_VER} =~ ^$nextcloud_ver ]]; then
+
 	# Stop php-fpm if running. If they are not running (which happens on a previously failed install), dont bail.
 	service php"$PHP_VER"-fpm stop &> /dev/null || /bin/true
 
@@ -247,12 +245,10 @@ if [ ! -d /usr/local/lib/owncloud/ ] || [[ ! ${CURRENT_NEXTCLOUD_VER} =~ ^$nextc
 		CURRENT_NEXTCLOUD_VER="25.0.7"
 	    fi
 	fi
-#    } # configure_site
 
-    InstallNextcloud $nextcloud_ver $nextcloud_hash $contacts_ver $contacts_hash $calendar_ver $calendar_hash $user_external_ver $user_external_hash
-fi
+        InstallNextcloud $nextcloud_ver $nextcloud_hash $contacts_ver $contacts_hash $calendar_ver $calendar_hash $user_external_ver $user_external_hash
+    fi
 
-configure_site && {
     # ### Configuring Nextcloud
 
     # Setup Nextcloud if the Nextcloud database does not yet exist. Running setup when
