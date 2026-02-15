@@ -8,9 +8,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # Install DKIM...
 echo "Installing OpenDKIM/OpenDMARC..."
@@ -45,7 +45,7 @@ RequireSafeKeys         false
 EOF
 fi
 
-configure_site && {
+site_code && {
     # Create a new DKIM key. This creates mail.private and mail.txt
     # in $STORAGE_ROOT/mail/dkim. The former is the private key and
     # the latter is the suggested DNS TXT entry which we'll include
@@ -63,7 +63,7 @@ configure_site && {
     # Ensure files are owned by the opendkim user and are private otherwise.
     chown -R opendkim:opendkim "$STORAGE_ROOT/mail/dkim"
     chmod go-rwx "$STORAGE_ROOT/mail/dkim"
-} # configure_site
+} # site_code
 
 tools/editconf.py /etc/opendmarc.conf -s \
 	          "Syslog=true" \
@@ -119,7 +119,7 @@ tools/editconf.py /etc/postfix/main.cf \
 	          non_smtpd_milters=\$smtpd_milters \
 	          milter_default_action=accept
 
-configure_site && {
+site_code && {
     # We need to explicitly enable the opendmarc service, or it will not start
     hide_output systemctl enable opendmarc
 
@@ -127,6 +127,6 @@ configure_site && {
     restart_service opendkim
     restart_service opendmarc
     restart_service postfix
-} # configure_site
+} # site_code
 
 true

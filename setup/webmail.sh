@@ -4,9 +4,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # ### Installing Roundcube
 
@@ -99,7 +99,7 @@ if [ $needs_update == 1 ]; then
     echo $UPDATE_KEY > ${RCM_DIR}/version
 fi
 
-configure_site && {
+site_code && {
     # ### Configuring Roundcube
 
     # Generate a secret key of PHP-string-safe characters appropriate
@@ -174,7 +174,7 @@ EOF
 ?>
 EOF
 
-} # configure_site
+} # site_code
 
 # Create writable directories.
 mkdir -p /var/log/roundcubemail /var/tmp/roundcubemail "$STORAGE_ROOT/mail/roundcube"
@@ -211,7 +211,7 @@ chown -f -R root:www-data ${RCM_PLUGIN_DIR}/carddav
 # root:www-data need all permissions, others only read
 chmod -R 774 ${RCM_PLUGIN_DIR}/carddav
 
-configure_site && {
+site_code && {
     # Run Roundcube database migration script (database is created if it does not exist)
     php"$PHP_VER" ${RCM_DIR}/bin/updatedb.sh --dir ${RCM_DIR}/SQL --package roundcube
     chown www-data:www-data "$STORAGE_ROOT/mail/roundcube/roundcube.sqlite"
@@ -230,6 +230,6 @@ configure_site && {
     # Enable PHP modules.
     phpenmod -v "$PHP_VER" imap
     restart_service php"$PHP_VER"-fpm
-} # configure_site
+} # site_code
 
 true

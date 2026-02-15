@@ -29,9 +29,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # ### Install packages.
 
@@ -49,7 +49,7 @@ apt_install postfix postfix-sqlite postfix-pcre postgrey ca-certificates
 
 # ### Basic Settings
 
-configure_site && {
+site_code && {
     # Set some basic settings...
     #
     # * Have postfix listen on all network interfaces.
@@ -64,7 +64,7 @@ configure_site && {
 	              myhostname="$PRIMARY_HOSTNAME"\
 	              smtpd_banner="\$myhostname ESMTP Hi, I'm a Mail-in-a-Box (Ubuntu/Postfix; see https://mailinabox.email/)" \
 	              mydestination=localhost
-} # configure_site
+} # site_code
 
 
 # Tweak some queue settings:
@@ -124,13 +124,13 @@ tools/editconf.py /etc/postfix/master.cf -s -w \
 # Install the `outgoing_mail_header_filters` file required by the new 'authclean' service.
 cp conf/postfix_outgoing_mail_header_filters /etc/postfix/outgoing_mail_header_filters
 
-configure_site && {
+site_code && {
     # Modify the `outgoing_mail_header_filters` file to use the local machine name and ip
     # on the first received header line.  This may help reduce the spam score of email by
     # removing the 127.0.0.1 reference.
     sed -i "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" /etc/postfix/outgoing_mail_header_filters
     sed -i "s/PUBLIC_IP/$PUBLIC_IP/" /etc/postfix/outgoing_mail_header_filters
-} # configure_site
+} # site_code
 
 # Enable TLS on incoming connections. It is not required on port 25, allowing for opportunistic
 # encryption. On ports 465 and 587 it is mandatory (see above). Shared and non-shared settings are
@@ -269,10 +269,10 @@ tools/editconf.py /etc/default/postgrey \
 
 # If the $STORAGE_ROOT/mail/postgrey is empty, copy the postgrey database over from the old location
 if [ ! -d "$STORAGE_ROOT/mail/postgrey/db" ]; then
-    configure_site && {
+    site_code && {
         # Stop the service
         service postgrey stop
-    } # configure_site
+    } # site_code
     # Ensure the new paths for postgrey db exists
     mkdir -p "$STORAGE_ROOT/mail/postgrey/db"
     # Move over database files
@@ -307,9 +307,9 @@ fi
 EOF
 chmod +x /etc/cron.daily/mailinabox-postgrey-whitelist
 
-configure_site && {
+site_code && {
     /etc/cron.daily/mailinabox-postgrey-whitelist
-} # configure_site
+} # site_code
 
 # Increase the message size limit from 10MB to 128MB.
 # The same limit is specified in nginx.conf for mail submitted via webmail and Z-Push.
@@ -322,11 +322,11 @@ ufw_allow smtp
 ufw_allow smtps
 ufw_allow submission
 
-configure_site && {
+site_code && {
     # Restart services
 
     restart_service postfix
     restart_service postgrey
-} # configure_site
+} # site_code
 
 true

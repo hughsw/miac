@@ -1,11 +1,12 @@
 #!/bin/bash
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf
-} # configure_site
+} # site_code
+
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     # Basic System Configuration
     # -------------------------
 
@@ -16,10 +17,10 @@ configure_site && {
     #
     # First set the hostname in the configuration file, then activate the setting
 
-    configure_host && {
+    host_code && {
         echo "$PRIMARY_HOSTNAME" > /etc/hostname
         hostname "$PRIMARY_HOSTNAME"
-    } # configure_host
+    } # host_code
 
     # ### Fix permissions
 
@@ -81,7 +82,7 @@ configure_site && {
 	    echo "ERROR: Swap allocation failed"
 	fi
     fi
-} # configure_site
+} # site_code
 
 # ### Set log retention policy.
 
@@ -159,6 +160,11 @@ apt_install python3 python3-dev python3-pip python3-setuptools \
 	    pollinate openssh-client unzip \
 	    unattended-upgrades cron ntp fail2ban rsyslog
 
+container_code && {
+    # container will have a managed time from the host, ntp is unable to change it
+    systemctl disable ntp
+} # container_code
+
 # ### Suppress Upgrade Prompts
 # When Ubuntu 20 comes out, we don't want users to be prompted to upgrade,
 # because we don't yet support it.
@@ -167,7 +173,7 @@ if [ -f /etc/update-manager/release-upgrades ]; then
     rm -f /var/lib/ubuntu-release-upgrader/release-upgrade-available
 fi
 
-configure_site && {
+site_code && {
     # ### Set the system timezone
     #
     # Some systems are missing /etc/timezone, which we cat into the configs for
@@ -261,7 +267,7 @@ configure_site && {
 	echo 'Creating SSH key for backup…'
 	ssh-keygen -t rsa -b 2048 -a 100 -f /root/.ssh/id_rsa_miab -N '' -q
     fi
-} #  configure_site
+} #  site_code
 
 # ### Package maintenance
 #
@@ -367,17 +373,17 @@ fi
 # installing bind9 or else apt won't be able to resolve a server to
 # download bind9 from.
 tools/editconf.py /etc/systemd/resolved.conf DNSStubListener=no
-configure_host && {
+host_code && {
     rm -f /etc/resolv.conf
     echo "nameserver 127.0.0.1" > /etc/resolv.conf
-} # configure_host
+} # host_code
 
-configure_site && {
+site_code && {
     # Restart the DNS services.
 
     restart_service bind9
     systemctl restart systemd-resolved
-} # configure_site
+} # site_code
 
 # ### Fail2Ban Service
 
@@ -385,7 +391,7 @@ configure_site && {
 rm -f /etc/fail2ban/jail.local # we used to use this file but don't anymore
 rm -f /etc/fail2ban/jail.d/defaults-debian.conf # removes default config so we can manage all of fail2ban rules in one config
 
-configure_site && {
+site_code && {
     cat conf/fail2ban/jails.conf \
         | sed "s/PUBLIC_IPV6/$PUBLIC_IPV6/g" \
 	| sed "s/PUBLIC_IP/$PUBLIC_IP/g" \
@@ -401,6 +407,6 @@ configure_site && {
     restart_service fail2ban
 
     systemctl enable fail2ban
-} # configure_site
+} # site_code
 
 true

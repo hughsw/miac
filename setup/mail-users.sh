@@ -9,9 +9,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # ### User and Alias Database
 
@@ -156,7 +156,7 @@ dbpath=$db_path
 query = SELECT destination from (SELECT destination, 0 as priority FROM aliases WHERE source='%s' AND destination<>'' UNION SELECT email as destination, 1 as priority FROM users WHERE email='%s' UNION SELECT destination, 2 as priority FROM auto_aliases WHERE source='%s' AND destination<>'') ORDER BY priority LIMIT 1;
 EOF
 
-configure_site && {
+site_code && {
     # Restart Services
     ##################
 
@@ -165,6 +165,6 @@ configure_site && {
 
     # force a recalculation of all user quotas
     doveadm quota recalc -A
-} # configure_site
+} # site_code
 
 true

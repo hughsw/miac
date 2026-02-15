@@ -10,9 +10,9 @@
 # plugin.
 
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # get global vars
-} # configure_site
+} # site_code
 source setup/functions.sh # load our functions
 
 # Install packages and basic configuration
@@ -71,7 +71,7 @@ tools/editconf.py /etc/spamassassin/local.cf -s \
 	          "add_header all Score"=_SCORE_
 
 
-configure_site && {
+site_code && {
     # Authentication-Results SPF/Dmarc checks
     # ---------------------------------------
     # OpenDKIM and OpenDMARC are configured to validate and add "Authentication-Results: ..."
@@ -121,7 +121,7 @@ describe SPF_FAIL SPF check failed
 score SPF_FAIL 5.0
 EOF
 
-} # configure_site
+} # site_code
 
 # Bayesean learning
 # -----------------
@@ -193,7 +193,7 @@ sudo -u spampd /usr/bin/sa-learn --sync 2>/dev/null
 chmod -R 660 "$STORAGE_ROOT/mail/spamassassin"
 chmod 770 "$STORAGE_ROOT/mail/spamassassin"
 
-configure_site && {
+site_code && {
     # Initial training?
     # sa-learn --ham storage/mail/mailboxes/*/*/cur/
     # sa-learn --spam storage/mail/mailboxes/*/*/.Spam/cur/
@@ -202,6 +202,6 @@ configure_site && {
     restart_service spampd
     restart_service dovecot
 
-} # configure_site
+} # site_code
 
 true

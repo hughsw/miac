@@ -4,9 +4,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # ### Installing Nextcloud
 
@@ -174,7 +174,7 @@ else
     CURRENT_NEXTCLOUD_VER=""
 fi
 
-configure_site && {
+site_code && {
 
     # If the Nextcloud directory is missing (never been installed before, or the nextcloud version to be installed is different
     # from the version currently installed, do the install/upgrade
@@ -384,7 +384,7 @@ EOF
     sudo -u www-data \
 	 php"$PHP_VER" /usr/local/lib/owncloud/occ app:disable photos dashboard activity \
 	| (grep -v "No such app enabled" || /bin/true)
-} # configure_site
+} # site_code
 
 # Set PHP FPM values to support large file uploads
 # (semicolon is the comment character in this file, hashes produce deprecation warnings)
@@ -406,14 +406,14 @@ tools/editconf.py /etc/php/"$PHP_VER"/cli/conf.d/10-opcache.ini -c ';' \
 	          opcache.save_comments=1 \
 	          opcache.revalidate_freq=1
 
-configure_site && {
+site_code && {
     # Migrate users_external data from <0.6.0 to version 3.0.0
     # (see https://github.com/nextcloud/user_external).
     # This version was probably in use in Mail-in-a-Box v0.41 (February 26, 2019) and earlier.
     # We moved to v0.6.3 in 193763f8. Ignore errors - maybe there are duplicated users with the
     # correct backend already.
     sqlite3 "$STORAGE_ROOT/owncloud/owncloud.db" "UPDATE oc_users_external SET backend='127.0.0.1';" || /bin/true
-} # configure_site
+} # site_code
 
 # Set up a general cron job for Nextcloud.
 # Also add another job for Calendar updates, per advice in the Nextcloud docs
@@ -426,7 +426,7 @@ cat > /etc/cron.d/mailinabox-nextcloud << EOF;
 EOF
 chmod +x /etc/cron.d/mailinabox-nextcloud
 
-configure_site && {
+site_code && {
     # We also need to change the sending mode from background-job to occ.
     # Or else the reminders will just be sent as soon as possible when the background jobs run.
     hide_output sudo -u www-data php"$PHP_VER" -f /usr/local/lib/owncloud/occ config:app:set dav sendEventRemindersMode --value occ
@@ -434,7 +434,7 @@ configure_site && {
     # Now set the config to read-only.
     # Do this only at the very bottom when no further occ commands are needed.
     sed -i'' "s/'config_is_read_only'\s*=>\s*false/'config_is_read_only' => true/" "$STORAGE_ROOT/owncloud/config.php"
-} # configure_site
+} # site_code
 
 # Rotate the nextcloud.log file
 cat > /etc/logrotate.d/nextcloud <<EOF
@@ -449,7 +449,7 @@ $STORAGE_ROOT/owncloud/nextcloud.log {
 }
 EOF
 
-configure_site && {
+site_code && {
     # There's nothing much of interest that a user could do as an admin for Nextcloud,
     # and there's a lot they could mess up, so we don't make any users admins of Nextcloud.
     # But if we wanted to, we would do this:
@@ -461,6 +461,6 @@ configure_site && {
 
     # Enable PHP modules and restart PHP.
     restart_service php"$PHP_VER"-fpm
-} # configure_site
+} # site_code
 
 true

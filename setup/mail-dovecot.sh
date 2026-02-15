@@ -17,9 +17,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 
 # Install packages for dovecot. These are all core dovecot plugins,
@@ -32,7 +32,7 @@ apt_install \
     dovecot-sieve dovecot-managesieved
 
 # This disabling isn't strictly necessary, but doing so prevents error
-# messages.  It gets enabled during configure_site runs.
+# messages.  It gets enabled during site_code runs.
 systemctl disable dovecot
 
 # The `dovecot-imapd`, `dovecot-pop3d`, and `dovecot-lmtpd` packages automatically
@@ -182,12 +182,12 @@ protocol imap {
 }
 EOF
 
-configure_site && {
+site_code && {
     # Setting a `postmaster_address` is required or LMTP won't start. An alias
     # will be created automatically by our management daemon.
     tools/editconf.py /etc/dovecot/conf.d/15-lda.conf \
 	              "postmaster_address=postmaster@$PRIMARY_HOSTNAME"
-} # configure_site
+} # site_code
 
 # ### Sieve
 
@@ -252,9 +252,9 @@ ufw_allow pop3s
 # Allow the Sieve port in the firewall.
 ufw_allow sieve
 
-configure_site && {
+site_code && {
     # Restart services.
     restart_service dovecot
-} # configure_site
+} # site_code
 
 true

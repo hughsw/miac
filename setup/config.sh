@@ -5,11 +5,17 @@
 # Default is that we are running on a host, not in a container, so run
 # all code
 
-function configure_host {
+# use for code that should only be run on a host, never in a container
+function host_code {
     true
 }
+# use for code that should only be run in a container, never on a host
+function container_code {
+    false
+}
 
-function configure_site {
+# use for code that is specific to a configured site (has a hostname, encryption keys, databases, etc)
+function site_code {
     true
 }
 
@@ -20,8 +26,11 @@ function configure_site {
 # is process running in a container
 if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
     # In any container, skip code that depends on running in a host environment
-    function configure_host {
+    function host_code {
         false
+    }
+    function container_code {
+        true
     }
 
     # Env settings for container setup
@@ -44,15 +53,15 @@ if [[ -e /run/.containerenv || -e /run/.dockerenv ]] ; then
     if grep --binary-files=binary -e '^/bin/sh\>' /proc/1/cmdline ; then
         # We are building an image, so no site-specific logic, but do the image-building-specific logic
 
-        # Skip code that depends on being in a container runtime, i.e. due to 'podman run ...'
-        function configure_site {
+        # Skip code that depends on being in a site-specific container runtime, i.e. due to 'podman run ...'
+        function site_code {
             false
         }
     else
         # We are a process in a running container, e.g. due to 'podman run ...' or  'docker run ...'
 
         # Containers set the container env var, so verify we're in a container runtime
-        [[ container == "podman" || container == "docker" ]]
+        [[ "$container" == "podman" || "$container" == "docker" ]]
 
         export PRIMARY_HOSTNAME=$(hostname)
     fi

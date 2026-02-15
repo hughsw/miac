@@ -21,7 +21,7 @@ if [ "${OS_RELEASE_ID:-}" != "ubuntu" ] || [ "${OS_RELEASE_VERSION_ID:-}" != "22
     exit 1
 fi
 
-configure_site && {
+site_code && {
     # Check that we have enough memory.
     #
     # /proc/meminfo reports free memory in kibibytes. Our baseline will be 512 MB,
@@ -69,6 +69,6 @@ configure_site && {
 	echo "You are on your own."
 	echo
     fi
-} # configure_site
+} # site_code
 
 true

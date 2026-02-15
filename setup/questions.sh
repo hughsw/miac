@@ -1,5 +1,5 @@
 #!/bin/bash
-configure_site && {
+site_code && {
     if [ -z "${NONINTERACTIVE:-}" ]; then
 	# Install 'dialog' so we can ask the user questions. The original motivation for
 	# this was being able to ask the user for input even if stdin has been redirected,
@@ -212,6 +212,6 @@ address, so we're suggesting $DEFAULT_PRIMARY_HOSTNAME.
 	echo "Mail-in-a-Box Version: $(git describe --always)"
     fi
     echo
-} # configure_site
+} # site_code
 
 true

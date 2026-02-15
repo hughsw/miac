@@ -12,9 +12,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # Prereqs.
 
@@ -82,10 +82,10 @@ cp conf/zpush/backend_caldav.php /usr/local/lib/z-push/backend/caldav/config.php
 # Configure Autodiscover
 rm -f /usr/local/lib/z-push/autodiscover/config.php
 cp conf/zpush/autodiscover_config.php /usr/local/lib/z-push/autodiscover/config.php
-configure_site && {
+site_code && {
     sed -i "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" /usr/local/lib/z-push/autodiscover/config.php
     sed -i "s^define('TIMEZONE', .*^define('TIMEZONE', '$(cat /etc/timezone)');^" /usr/local/lib/z-push/autodiscover/config.php
-} # configure_site
+} # site_code
 
 # Some directories it will use.
 
@@ -109,7 +109,7 @@ cat > /etc/logrotate.d/z-push <<EOF;
 }
 EOF
 
-configure_site && {
+site_code && {
     # Restart service.
 
     restart_service php"$PHP_VER"-fpm
@@ -119,6 +119,6 @@ configure_site && {
     if [ $needs_update == 1 ]; then
 	hide_output php"$PHP_VER" /usr/local/lib/z-push/z-push-admin.php -a fixstates
     fi
-} # configure_site
+} # site_code
 
 true

@@ -4,16 +4,16 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # install Munin
 echo "Installing Munin (system monitoring)..."
 apt_install munin munin-node libcgi-fast-perl
 # libcgi-fast-perl is needed by /usr/lib/munin/cgi/munin-cgi-graph
 
-configure_site && {
+site_code && {
     # edit config
     cat > /etc/munin/munin.conf <<EOF;
 dbdir /var/lib/munin
@@ -61,7 +61,7 @@ EOF
 	    rm "$f";
         fi;
     done
-} # configure_site
+} # site_code
 
 # Create a 'state' directory. Not sure why we need to do this manually.
 mkdir -p /var/lib/munin-node/plugin-state/
@@ -71,7 +71,7 @@ ln -sf "$PWD/management/munin_start.sh" /usr/local/lib/mailinabox/munin_start.sh
 chmod 0744 /usr/local/lib/mailinabox/munin_start.sh
 cp --remove-destination conf/munin.service /lib/systemd/system/munin.service # target was previously a symlink so remove first
 
-configure_site && {
+site_code && {
     hide_output systemctl link -f /lib/systemd/system/munin.service
     hide_output systemctl daemon-reload
     hide_output systemctl unmask munin.service
@@ -89,6 +89,6 @@ configure_site && {
     if [ ! -f /var/run/munin/munin-update.lock ]; then
 	sudo -H -u munin munin-cron
     fi
-} # configure_site
+} # site_code
 
 true

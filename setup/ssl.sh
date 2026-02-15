@@ -23,11 +23,11 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
-configure_site && {
+site_code && {
     # Show a status line if we are going to take any action in this file.
     if  [ ! -f /usr/bin/openssl ] \
             || [ ! -f "$STORAGE_ROOT/ssl/ssl_private_key.pem" ] \
@@ -35,7 +35,7 @@ configure_site && {
             || [ ! -f "$STORAGE_ROOT/ssl/dh2048.pem" ]; then
 	echo "Creating initial SSL certificate and perfect forward secrecy Diffie-Hellman parameters..."
     fi
-} # configure_site
+} # site_code
 
 # Install openssl.
 
@@ -45,7 +45,7 @@ apt_install openssl
 
 mkdir -p "$STORAGE_ROOT/ssl"
 
-configure_site && {
+site_code && {
     # Generate a new private key.
     #
     # The key is only as good as the entropy available to openssl so that it
@@ -102,7 +102,7 @@ configure_site && {
     if [ ! -f "$STORAGE_ROOT/ssl/dh2048.pem" ]; then
 	openssl dhparam -out "$STORAGE_ROOT/ssl/dh2048.pem" 2048
     fi
-} # configure_site
+} # site_code
 
 # Cleanup expired SSL certificates from $STORAGE_ROOT/ssl daily
 cat > /etc/cron.daily/mailinabox-ssl-cleanup << EOF;

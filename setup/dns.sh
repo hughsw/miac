@@ -9,9 +9,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # Prepare nsd's configuration.
 # We configure nsd before installation as we only want it to bind to some addresses
@@ -21,7 +21,7 @@ mkdir -p /etc/nsd
 mkdir -p /etc/nsd/zones
 touch /etc/nsd/zones.conf
 
-configure_site && {
+site_code && {
     cat > /etc/nsd/nsd.conf << EOF;
 # Do not edit. Overwritten by Mail-in-a-Box setup.
 server:
@@ -87,7 +87,7 @@ systemctl disable nsd
 
 mkdir -p "$STORAGE_ROOT/dns/dnssec";
 
-configure_site && {
+site_code && {
     # TLDs, registrars, and validating nameservers don't all support the same algorithms,
     # so we'll generate keys using a few different algorithms so that dns_update.py can
     # choose which algorithm to use when generating the zonefiles. See #1953 for recent
@@ -144,7 +144,7 @@ EOF
 
 	# And loop to do the next algorithm...
     done
-} # configure_site
+} # site_code
 
 # Force the dns_update script to be run every day to re-sign zones for DNSSEC
 # before they expire. When we sign zones (in `dns_update.py`) we specify a

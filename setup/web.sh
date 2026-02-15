@@ -4,9 +4,9 @@
 
 source setup/functions.sh # load our functions
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 # Some Ubuntu images start off with Apache. Remove it since we
 # will use nginx. Use autoremove to remove any Apache dependencies.
@@ -60,7 +60,7 @@ tools/editconf.py /etc/php/"$PHP_VER"/fpm/php.ini -c ';' \
 tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
 	          env[PATH]=/usr/local/bin:/usr/bin:/bin
 
-#configure_site && {
+#site_code && {
     # Configure php-fpm based on the amount of memory the machine has
     # This is based on the nextcloud manual for performance tuning: https://docs.nextcloud.com/server/17/admin_manual/installation/server_tuning.html
     # Some synchronisation issues can occur when many people access the site at once.
@@ -98,7 +98,7 @@ tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
                           pm.min_spare_servers=6 \
                           pm.max_spare_servers=18
     fi
-#} # configure_site
+#} # site_code
 
 # Other nginx settings will be configured by the management service
 # since it depends on what domains we're serving, which we don't know
@@ -109,7 +109,7 @@ tools/editconf.py /etc/php/"$PHP_VER"/fpm/pool.d/www.conf -c ';' \
 mkdir -p /var/lib/mailinabox
 chmod a+rx /var/lib/mailinabox
 
-configure_site && {
+site_code && {
     cat conf/ios-profile.xml \
 	| sed "s/PRIMARY_HOSTNAME/$PRIMARY_HOSTNAME/" \
 	| sed "s/UUID1/$(cat /proc/sys/kernel/random/uuid)/" \
@@ -155,7 +155,7 @@ configure_site && {
     # Start services.
     restart_service nginx
     restart_service php"$PHP_VER"-fpm
-} # configure_site
+} # site_code
 
 # Open ports.
 ufw_allow http

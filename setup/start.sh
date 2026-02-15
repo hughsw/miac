@@ -31,7 +31,7 @@ export LC_TYPE=en_US.UTF-8
 # Fix so line drawing characters are shown correctly in Putty on Windows. See #744.
 export NCURSES_NO_UTF8_ACS=1
 
-#configure_site && {
+#site_code && {
     # Recall the last settings used if we're running this a second time.
     if [ -f /etc/mailinabox.conf ]; then
 	# Run any system migrations before proceeding. Since this is a second run,
@@ -46,7 +46,7 @@ export NCURSES_NO_UTF8_ACS=1
     else
 	FIRST_TIME_SETUP=1
     fi
-#} # configure_site
+#} # site_code
 
 # Put a start script in a global location. We tell the user to run 'mailinabox'
 # in the first dialog prompt, so we should do this before that starts.
@@ -94,7 +94,7 @@ if [ ! -f "$STORAGE_ROOT/mailinabox.version" ]; then
     chown "$STORAGE_USER:$STORAGE_USER" "$STORAGE_ROOT/mailinabox.version"
 fi
 
-configure_site && {
+site_code && {
     # Save the global options in /etc/mailinabox.conf so that standalone
     # tools know where to look for data. The default MTA_STS_MODE setting
     # is blank unless set by an environment variable, but see web.sh for
@@ -109,7 +109,7 @@ PRIVATE_IP=$PRIVATE_IP
 PRIVATE_IPV6=$PRIVATE_IPV6
 MTA_STS_MODE=${DEFAULT_MTA_STS_MODE:-enforce}
 EOF
-} # configure_site
+} # site_code
 
 # Start service configuration.
 source setup/system.sh
@@ -127,7 +127,7 @@ source setup/zpush.sh
 source setup/management.sh
 source setup/munin.sh
 
-configure_site && {
+site_code && {
     # Wait for the management daemon to start...
     until nc -z -w 4 127.0.0.1 10222
     do
@@ -189,6 +189,6 @@ configure_site && {
 	echo "Then you can confirm the security exception and continue."
 	echo
     fi
-} # configure_site
+} # site_code
 
 true

@@ -2,9 +2,9 @@
 
 source setup/functions.sh
 
-configure_site && {
+site_code && {
     source /etc/mailinabox.conf # load global vars
-} # configure_site
+} # site_code
 
 echo "Installing Mail-in-a-Box system management daemon..."
 
@@ -57,11 +57,11 @@ hide_output $venv/bin/pip install --upgrade \
 # Create a backup directory and a random key for encrypting backups.
 mkdir -p "$STORAGE_ROOT/backup"
 
-configure_site && {
+site_code && {
     if [ ! -f "$STORAGE_ROOT/backup/secret_key.txt" ]; then
 	(umask 077; openssl rand -base64 2048 > "$STORAGE_ROOT/backup/secret_key.txt")
     fi
-} # configure_site
+} # site_code
 
 
 # Download jQuery and Bootstrap local files
@@ -112,7 +112,7 @@ EOF
 chmod +x $inst_dir/start
 cp --remove-destination conf/mailinabox.service /lib/systemd/system/mailinabox.service # target was previously a symlink so remove it first
 
-configure_site && {
+site_code && {
     hide_output systemctl link -f /lib/systemd/system/mailinabox.service
     hide_output systemctl daemon-reload
     hide_output systemctl enable mailinabox.service
@@ -129,6 +129,6 @@ EOF
 
     # Start the management server.
     restart_service mailinabox
-} # configure_site
+} # site_code
 
 true
