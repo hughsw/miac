@@ -161,8 +161,9 @@ apt_install python3 python3-dev python3-pip python3-setuptools \
 	    unattended-upgrades cron ntp fail2ban rsyslog
 
 container_code && {
-    # container will have a managed time from the host, ntp is unable to change it
-    systemctl disable ntp
+    # container will have a managed time from the host, ntp is unable to change it and should not be running
+    systemctl mask ntp
+    #systemctl disable ntp
 } # container_code
 
 # ### Suppress Upgrade Prompts
